@@ -1,0 +1,836 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>IIT Hyderabad — Verifiable Credentials</title>
+  <meta name="description"
+    content="Decentralized Identity and Verifiable Credentials management for university students, admins, and verifiers." />
+  <link rel="stylesheet" href="/static/styles.css?v=5" />
+  <link rel="icon" href="/static/logo.svg" type="image/svg+xml" />
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
+</head>
+
+<body>
+
+  <div class="toast-container" id="toasts"></div>
+
+  <div class="app-container">
+
+    <!-- ═══ LOGIN VIEW ═══ -->
+    <div id="view-login" class="view active">
+      <div class="login-split">
+
+        <!-- ── Brand Panel (Left) ── -->
+        <div class="login-brand">
+          <div class="login-brand__inner">
+            <div class="login-brand__logo">
+              <img src="/static/logo.svg" alt="IIT Hyderabad" class="login-brand__logo-img" />
+              <div class="login-brand__logo-text">
+                <span class="login-brand__institution">IIT Hyderabad</span>
+                <span class="login-brand__dept">Academic Records Office</span>
+              </div>
+            </div>
+
+            <div class="login-brand__eyebrow">Digital Credential Platform</div>
+            <p class="login-brand__tagline">Secure Academic Credentials,<br><em>Decentralized.</em></p>
+            <p class="login-brand__intro">
+              A premium institutional workspace for issuing, claiming, and verifying tamper-proof academic credentials across admin, student, and verifier journeys.
+            </p>
+
+            <div class="login-brand__metrics">
+              <div class="login-brand__metric">
+                <span class="login-brand__metric-value">3</span>
+                <span class="login-brand__metric-label">Role Workspaces</span>
+              </div>
+              <div class="login-brand__metric">
+                <span class="login-brand__metric-value">W3C</span>
+                <span class="login-brand__metric-label">Standards Aligned</span>
+              </div>
+              <div class="login-brand__metric">
+                <span class="login-brand__metric-value">OID4VC</span>
+                <span class="login-brand__metric-label">Wallet Ready</span>
+              </div>
+            </div>
+
+            <div class="login-brand__features">
+              <div class="login-brand__feature">
+                <span class="login-brand__feature-icon">
+                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 2l-2 2m-7.61 7.61a5.5 5.5 0 1 1-7.778 7.778 5.5 5.5 0 0 1 7.777-7.777zm0 0L15.5 7.5m0 0l3 3L22 7l-3-3m-3.5 3.5L19 4"/></svg>
+                </span>
+                <div>
+                  <div class="login-brand__feature-title">Decentralized Identity</div>
+                  <div class="login-brand__feature-sub">W3C DID — you own your identity</div>
+                </div>
+              </div>
+              <div class="login-brand__feature">
+                <span class="login-brand__feature-icon">
+                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+                </span>
+                <div>
+                  <div class="login-brand__feature-title">Verifiable Credentials</div>
+                  <div class="login-brand__feature-sub">Tamper-proof, cryptographically signed</div>
+                </div>
+              </div>
+              <div class="login-brand__feature">
+                <span class="login-brand__feature-icon">
+                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
+                </span>
+                <div>
+                  <div class="login-brand__feature-title">Privacy-Preserving</div>
+                  <div class="login-brand__feature-sub">Selective disclosure via OID4VP</div>
+                </div>
+              </div>
+            </div>
+
+            <div class="login-brand__footer">
+              <span class="login-brand__footer-badge">W3C DID Core</span>
+              <span class="login-brand__footer-badge">OID4VCI</span>
+              <span class="login-brand__footer-badge">OID4VP</span>
+            </div>
+          </div>
+          <!-- Decorative mesh pattern -->
+          <div class="login-brand__pattern" aria-hidden="true"></div>
+        </div>
+
+        <!-- ── Form Panel (Right) ── -->
+        <div class="login-form-panel">
+          <div class="login-form-inner">
+
+            <div class="login-form-header" id="login-form-heading">
+              <div class="login-form-eyebrow">Institutional Access</div>
+              <h2 class="login-form-title">Welcome back</h2>
+              <p class="login-form-sub">Sign in to your institutional account</p>
+            </div>
+
+            <!-- Auth tab switcher -->
+            <div class="auth-tabs">
+              <button class="auth-tab active" id="tab-login" onclick="switchAuthTab('login')">Sign In</button>
+              <button class="auth-tab" id="tab-register" onclick="switchAuthTab('register')">Register</button>
+            </div>
+
+            <div class="login-quick-access">
+              <div class="login-quick-access__header">
+                <div>
+                  <div class="login-quick-access__title">Try the demo journeys</div>
+                  <div class="login-quick-access__sub">Fill sample credentials instantly without changing the underlying auth flow.</div>
+                </div>
+              </div>
+              <div class="login-quick-grid">
+                <button type="button" class="login-quick-card" onclick="switchAuthTab('login'); fillLogin('student1', 'student123')">
+                  <span class="login-quick-card__role">Student</span>
+                  <span class="login-quick-card__cred">student1</span>
+                </button>
+                <button type="button" class="login-quick-card" onclick="switchAuthTab('login'); fillLogin('admin', 'admin123')">
+                  <span class="login-quick-card__role">Admin</span>
+                  <span class="login-quick-card__cred">admin</span>
+                </button>
+                <button type="button" class="login-quick-card" onclick="switchAuthTab('login'); fillLogin('verifier1', 'verifier123')">
+                  <span class="login-quick-card__role">Verifier</span>
+                  <span class="login-quick-card__cred">verifier1</span>
+                </button>
+                <button type="button" class="login-quick-card" onclick="switchAuthTab('login'); fillLogin('student2', 'student456')">
+                  <span class="login-quick-card__role">Alt Student</span>
+                  <span class="login-quick-card__cred">student2</span>
+                </button>
+              </div>
+            </div>
+
+            <!-- ── Sign In Form ── -->
+            <div id="auth-login">
+              <div class="form-group">
+                <label class="form-label">Roll Number / Username</label>
+                <input type="text" id="login-username" class="form-input" placeholder="e.g. 2021CS001"
+                  autocomplete="username" />
+              </div>
+              <div class="form-group">
+                <label class="form-label">Password</label>
+                <div class="input-group">
+                  <input type="password" id="login-password" class="form-input" placeholder="••••••••"
+                    autocomplete="current-password" />
+                  <button type="button" class="input-group__toggle" onclick="togglePassword('login-password', this)" tabindex="-1" aria-label="Toggle password">
+                    <svg class="eye-icon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
+                    <svg class="eye-off-icon" style="display:none" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19m-6.72-1.07a3 3 0 1 1-4.24-4.24"/><line x1="1" y1="1" x2="23" y2="23"/></svg>
+                  </button>
+                </div>
+              </div>
+              <button class="btn btn-primary btn-block login-submit-btn" id="btn-login">
+                <span class="btn-label">Sign In</span>
+                <span class="btn-spinner" style="display:none">
+                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" class="spin-icon"><path d="M21 12a9 9 0 1 1-6.219-8.56"/></svg>
+                </span>
+              </button>
+            </div>
+
+            <!-- ── Register Form ── -->
+            <div id="auth-register" style="display:none;">
+
+              <!-- Role selector cards -->
+              <div class="form-group">
+                <label class="form-label">Select Role</label>
+                <div class="role-selector">
+                  <button type="button" class="role-card active" data-role="student" onclick="selectRole('student')">
+                    <span class="role-card__icon">
+                      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M22 10v6M2 10l10-5 10 5-10 5z"/><path d="M6 12v5c3 3 9 3 12 0v-5"/></svg>
+                    </span>
+                    <span class="role-card__label">Student</span>
+                  </button>
+                  <button type="button" class="role-card" data-role="admin" onclick="selectRole('admin')">
+                    <span class="role-card__icon">
+                      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="12" cy="12" r="3"/><path d="M19.07 4.93a10 10 0 0 1 0 14.14M4.93 4.93a10 10 0 0 0 0 14.14"/></svg>
+                    </span>
+                    <span class="role-card__label">Admin</span>
+                  </button>
+                  <button type="button" class="role-card" data-role="verifier" onclick="selectRole('verifier')">
+                    <span class="role-card__icon">
+                      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M9 11l3 3L22 4"/><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"/></svg>
+                    </span>
+                    <span class="role-card__label">Verifier</span>
+                  </button>
+                </div>
+                <input type="hidden" id="reg-role" value="student" />
+              </div>
+
+              <div class="form-group">
+                <label class="form-label" id="reg-roll-label">Roll Number</label>
+                <input type="text" id="reg-roll" class="form-input" placeholder="e.g. 2022CS101" />
+              </div>
+              <div class="form-group">
+                <label class="form-label">Full Name</label>
+                <input type="text" id="reg-name" class="form-input" placeholder="e.g. Sankalp Kumar" />
+              </div>
+              <div class="form-group">
+                <label class="form-label">Password</label>
+                <div class="input-group">
+                  <input type="password" id="reg-password" class="form-input" placeholder="Min 6 characters" />
+                  <button type="button" class="input-group__toggle" onclick="togglePassword('reg-password', this)" tabindex="-1" aria-label="Toggle password">
+                    <svg class="eye-icon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
+                    <svg class="eye-off-icon" style="display:none" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19m-6.72-1.07a3 3 0 1 1-4.24-4.24"/><line x1="1" y1="1" x2="23" y2="23"/></svg>
+                  </button>
+                </div>
+              </div>
+              <button class="btn btn-primary btn-block login-submit-btn" id="btn-register">
+                <span class="btn-label">Create Account</span>
+                <span class="btn-spinner" style="display:none">
+                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" class="spin-icon"><path d="M21 12a9 9 0 1 1-6.219-8.56"/></svg>
+                </span>
+              </button>
+            </div>
+
+            <p class="login-form-footer">Protected by W3C Verifiable Credentials &amp; DID standards</p>
+          </div>
+        </div>
+
+      </div>
+    </div>
+
+    <!-- ═══ STUDENT VIEW ═══ -->
+    <div id="view-student" class="view">
+      <nav class="navbar">
+        <a class="navbar-brand" href="#">
+          <img src="/static/logo.svg" alt="" class="logo-img"> IIT Hyderabad
+        </a>
+        <div class="navbar-right">
+          <span class="user-badge"><span class="dot"></span> <span id="student-name"></span></span>
+          <button class="btn btn-outline btn-sm" onclick="logout()">Sign Out</button>
+        </div>
+      </nav>
+
+      <div class="student-shell">
+        <div class="student-toprow">
+          <div>
+            <div class="student-breadcrumb">Student / Credential Wallet</div>
+            <h2 class="student-title">Student Workspace</h2>
+            <p class="student-subtitle">Claim credentials, respond to verification requests, and track trust history.</p>
+          </div>
+          <div class="student-top-actions">
+            <button class="btn btn-outline btn-sm student-hamburger-btn" type="button" onclick="toggleStudentMenu()">☰ Menu</button>
+          </div>
+        </div>
+
+        <section class="workspace-hero workspace-hero--student">
+          <div class="workspace-hero__content">
+            <div class="workspace-hero__eyebrow">Wallet Experience</div>
+            <h3 class="workspace-hero__title">Everything a student needs, without interface noise.</h3>
+            <p class="workspace-hero__text">Review claimable credentials first, keep your identity status visible, and respond to verifier requests from a calmer, more premium workspace.</p>
+            <div class="workspace-hero__actions">
+              <button class="btn btn-primary btn-sm" type="button" onclick="setStudentScreen('credentials')">Open Credentials</button>
+              <button class="btn btn-outline btn-sm" type="button" onclick="setStudentScreen('challenges')">Review Requests</button>
+              <button class="btn btn-outline btn-sm" type="button" onclick="setStudentScreen('identity')">View Identity</button>
+            </div>
+          </div>
+          <div class="workspace-hero__rail">
+            <span class="workspace-hero__pill">Pending claims first</span>
+            <span class="workspace-hero__pill">Wallet-bound DID</span>
+            <span class="workspace-hero__pill">Verifier history</span>
+          </div>
+        </section>
+
+        <div id="student-menu-overlay" class="student-menu-overlay" onclick="closeStudentMenu()"></div>
+        <aside id="student-menu-drawer" class="student-menu-drawer" aria-hidden="true">
+          <div class="student-menu-header">
+            <div class="student-menu-title">Student Menu</div>
+            <button class="btn btn-outline btn-sm" type="button" onclick="closeStudentMenu()">Close</button>
+          </div>
+
+          <div class="student-menu-group">
+            <div class="student-menu-group-title">Focus View</div>
+            <button class="student-menu-link" type="button" onclick="setStudentScreen('credentials'); closeStudentMenu();">Credentials</button>
+            <button class="student-menu-link" type="button" onclick="setStudentScreen('challenges'); closeStudentMenu();">Verification Requests</button>
+            <button class="student-menu-link" type="button" onclick="setStudentScreen('identity'); closeStudentMenu();">My Identity</button>
+            <button class="student-menu-link" type="button" onclick="setStudentScreen('history'); closeStudentMenu();">Verification History</button>
+            <button class="student-menu-link" type="button" onclick="setStudentScreen('overview'); closeStudentMenu();">Show All Sections</button>
+          </div>
+
+          <div class="student-menu-group">
+            <div class="student-menu-group-title">Density</div>
+            <button class="student-menu-link" type="button" onclick="toggleStudentSection('summary')">Toggle Summary Strip</button>
+          </div>
+
+          <div class="student-menu-group">
+            <div class="student-menu-group-title">Actions</div>
+            <button class="student-menu-link" type="button" onclick="loadStudentData(); closeStudentMenu();">Refresh All</button>
+          </div>
+        </aside>
+
+        <div class="stats-grid student-summary-strip" id="student-summary-strip">
+          <div class="stat-card">
+            <div class="stat-value" id="stat-did">—</div>
+            <div class="stat-label">DID Status</div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-value" id="stat-vcs">0</div>
+            <div class="stat-label">Credentials</div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-value" id="stat-challenges">0</div>
+            <div class="stat-label">Challenges</div>
+          </div>
+        </div>
+
+        <section id="student-tab-credentials" class="card student-section active">
+          <div class="card-header" style="justify-content:space-between; align-items:center;">
+            <div style="display:flex; align-items:center; gap:0.75rem;">
+              <div class="card-icon blue">📜</div>
+              <div>
+                <div class="card-title">My Credentials</div>
+                <div class="card-subtitle">Review pending offers first, open full records only when needed</div>
+              </div>
+            </div>
+            <button class="btn btn-outline btn-sm" onclick="loadVCs()" title="Refresh Credentials">↻ Refresh</button>
+          </div>
+
+          <div class="student-cred-controls" id="student-cred-controls">
+            <input
+              type="text"
+              id="student-cred-search"
+              class="form-input"
+              placeholder="Search by type or credential summary"
+              oninput="handleStudentCredentialSearch(this.value)"
+            />
+            <div class="student-cred-filters" id="student-cred-filters">
+              <button type="button" class="student-cred-chip active" data-filter="pending" onclick="setStudentCredentialFilter('pending')">Pending</button>
+              <button type="button" class="student-cred-chip" data-filter="claimed" onclick="setStudentCredentialFilter('claimed')">Claimed</button>
+              <button type="button" class="student-cred-chip" data-filter="all" onclick="setStudentCredentialFilter('all')">All</button>
+              <button type="button" class="student-cred-chip" data-filter="UniversityDegreeCredential" onclick="setStudentCredentialFilter('UniversityDegreeCredential')">Degree</button>
+              <button type="button" class="student-cred-chip" data-filter="InternshipCredential" onclick="setStudentCredentialFilter('InternshipCredential')">Internship</button>
+              <button type="button" class="student-cred-chip" data-filter="SkillBadgeCredential" onclick="setStudentCredentialFilter('SkillBadgeCredential')">Skill</button>
+            </div>
+          </div>
+
+          <div id="vc-list"></div>
+        </section>
+
+        <section id="student-tab-challenges" class="card student-section">
+          <div class="card-header" style="justify-content:space-between; align-items:center;">
+            <div style="display:flex; align-items:center; gap:0.75rem;">
+              <div class="card-icon amber">⚡</div>
+              <div>
+                <div class="card-title">Verification Requests</div>
+                <div class="card-subtitle">Proof requests waiting for wallet response</div>
+              </div>
+            </div>
+            <button class="btn btn-outline btn-sm" onclick="loadChallenges()" title="Refresh">↻ Refresh</button>
+          </div>
+          <div id="challenge-list"></div>
+        </section>
+
+        <section id="student-tab-identity" class="card student-section">
+          <div class="card-header">
+            <div class="card-icon purple">🔑</div>
+            <div>
+              <div class="card-title">My Decentralized Identity</div>
+              <div class="card-subtitle">Wallet-bound DID and key reference</div>
+            </div>
+          </div>
+          <div id="did-content">
+            <p style="color:var(--text-muted);font-size:0.85rem;margin-bottom:1rem;">
+              No DID created yet. Your DID will be automatically created when you accept a credential with your wallet.
+            </p>
+          </div>
+        </section>
+
+        <section id="student-tab-history" class="student-section">
+          <div class="section-header">
+            <div>
+              <div class="section-title">Verification History</div>
+              <div class="section-subtitle">All verification sessions for your credentials</div>
+            </div>
+            <button class="btn btn-outline btn-sm" onclick="loadStudentHistory()">↻ Refresh</button>
+          </div>
+          <div class="card" style="padding:0.5rem;">
+            <div id="student-history-list"></div>
+          </div>
+        </section>
+      </div>
+    </div>
+
+    <!-- ═══ ADMIN VIEW ═══ -->
+    <div id="view-admin" class="view">
+      <nav class="navbar">
+        <a class="navbar-brand" href="#">
+          <img src="/static/logo.svg" alt="" class="logo-img"> IIT Hyderabad
+        </a>
+        <div class="navbar-right">
+          <span class="user-badge"><span class="dot"></span> Admin</span>
+          <button class="btn btn-outline btn-sm" onclick="logout()">Sign Out</button>
+        </div>
+      </nav>
+
+      <div class="admin-shell">
+        <div class="admin-toprow">
+          <div>
+            <div class="admin-breadcrumb">Admin / Credential Management</div>
+            <h2 class="admin-title">Admin Operations</h2>
+            <p class="admin-subtitle">Issue credentials, monitor student readiness, and track issuance outcomes.</p>
+          </div>
+          <div class="admin-top-actions">
+            <button class="btn btn-outline btn-sm admin-hamburger-btn" type="button" onclick="toggleAdminMenu()">☰ Menu</button>
+          </div>
+        </div>
+
+        <section class="workspace-hero workspace-hero--admin">
+          <div class="workspace-hero__content">
+            <div class="workspace-hero__eyebrow">Issuance Console</div>
+            <h3 class="workspace-hero__title">Issue, track, and inspect credentials from one polished control surface.</h3>
+            <p class="workspace-hero__text">Move from student lookup to credential composition to QR delivery with stronger hierarchy and clearer next steps, while the underlying issuance flow stays unchanged.</p>
+            <div class="workspace-hero__actions">
+              <button class="btn btn-primary btn-sm" type="button" onclick="setAdminScreen('composer')">Compose Credential</button>
+              <button class="btn btn-outline btn-sm" type="button" onclick="setAdminScreen('directory')">Browse Students</button>
+              <button class="btn btn-outline btn-sm" type="button" onclick="setAdminScreen('ledger')">Open Ledger</button>
+            </div>
+          </div>
+          <div class="workspace-hero__rail">
+            <span class="workspace-hero__pill">Directory-first workflow</span>
+            <span class="workspace-hero__pill">QR-based delivery</span>
+            <span class="workspace-hero__pill">Ledger and issuer tools</span>
+          </div>
+        </section>
+
+        <div id="admin-menu-overlay" class="admin-menu-overlay" onclick="closeAdminMenu()"></div>
+        <aside id="admin-menu-drawer" class="admin-menu-drawer" aria-hidden="true">
+          <div class="admin-menu-header">
+            <div class="admin-menu-title">Workspace Menu</div>
+            <button class="btn btn-outline btn-sm" type="button" onclick="closeAdminMenu()">Close</button>
+          </div>
+
+          <div class="admin-menu-group">
+            <div class="admin-menu-group-title">Focus View</div>
+            <button class="admin-menu-link" type="button" onclick="setAdminScreen('composer'); closeAdminMenu();">Credential Composer</button>
+            <button class="admin-menu-link" type="button" onclick="setAdminScreen('directory'); closeAdminMenu();">Student Directory</button>
+            <button class="admin-menu-link" type="button" onclick="setAdminScreen('ledger'); closeAdminMenu();">Issued Ledger</button>
+            <button class="admin-menu-link" type="button" onclick="setAdminScreen('advanced'); closeAdminMenu();">Advanced Tools</button>
+            <button class="admin-menu-link" type="button" onclick="setAdminScreen('overview'); closeAdminMenu();">Show All Sections</button>
+          </div>
+
+          <div class="admin-menu-group">
+            <div class="admin-menu-group-title">Density</div>
+            <button class="admin-menu-link" type="button" onclick="toggleAdminSection('kpi')">Toggle KPI Strip</button>
+            <button class="admin-menu-link" type="button" onclick="toggleAdminSection('filters')">Toggle Filters</button>
+          </div>
+
+          <div class="admin-menu-group">
+            <div class="admin-menu-group-title">Actions</div>
+            <button class="admin-menu-link" type="button" onclick="refreshAdminDashboard(true); closeAdminMenu();">Refresh Data</button>
+          </div>
+        </aside>
+
+        <div class="admin-kpi-grid" id="admin-kpi-strip">
+          <div class="admin-kpi-card">
+            <div class="admin-kpi-value" id="admin-kpi-students">0</div>
+            <div class="admin-kpi-label">Total Students</div>
+          </div>
+          <div class="admin-kpi-card">
+            <div class="admin-kpi-value" id="admin-kpi-did">0</div>
+            <div class="admin-kpi-label">DID Ready</div>
+          </div>
+          <div class="admin-kpi-card">
+            <div class="admin-kpi-value" id="admin-kpi-pending">0</div>
+            <div class="admin-kpi-label">Pending Offers</div>
+          </div>
+          <div class="admin-kpi-card">
+            <div class="admin-kpi-value" id="admin-kpi-today">0</div>
+            <div class="admin-kpi-label">Issued Today</div>
+          </div>
+        </div>
+
+        <div class="admin-main-grid" id="admin-main-grid">
+          <section class="card admin-panel" id="admin-directory-panel">
+            <div class="section-header admin-panel-header">
+              <div>
+                <div class="section-title">Student Directory</div>
+                <div class="section-subtitle">Search and select a student to preload the composer</div>
+              </div>
+            </div>
+
+            <div class="admin-directory-controls" id="admin-directory-controls">
+              <input
+                type="text"
+                id="admin-student-search"
+                class="form-input"
+                placeholder="Search by roll number, name, or DID"
+                oninput="handleAdminStudentSearch(this.value)"
+              />
+              <div class="admin-filter-row" id="admin-student-filters">
+                <button type="button" class="admin-filter-chip active" data-filter="all" onclick="setAdminStudentFilter('all')">All</button>
+                <button type="button" class="admin-filter-chip" data-filter="did" onclick="setAdminStudentFilter('did')">DID Ready</button>
+                <button type="button" class="admin-filter-chip" data-filter="no-did" onclick="setAdminStudentFilter('no-did')">No DID</button>
+                <button type="button" class="admin-filter-chip" data-filter="with-vc" onclick="setAdminStudentFilter('with-vc')">With VCs</button>
+                <button type="button" class="admin-filter-chip" data-filter="no-vc" onclick="setAdminStudentFilter('no-vc')">No VCs</button>
+              </div>
+            </div>
+
+            <div id="admin-student-list"></div>
+          </section>
+
+          <section class="card admin-panel" id="admin-composer-card">
+            <div class="card-header" style="margin-bottom:1rem;">
+              <div class="card-icon green">✦</div>
+              <div>
+                <div class="card-title">Credential Composer</div>
+                <div class="card-subtitle">Step-by-step issuance flow</div>
+              </div>
+            </div>
+
+            <div class="workflow-strip">
+              <div class="workflow-strip__item">
+                <span class="workflow-strip__step">01</span>
+                <span class="workflow-strip__label">Select Student</span>
+              </div>
+              <div class="workflow-strip__item">
+                <span class="workflow-strip__step">02</span>
+                <span class="workflow-strip__label">Configure Fields</span>
+              </div>
+              <div class="workflow-strip__item">
+                <span class="workflow-strip__step">03</span>
+                <span class="workflow-strip__label">Share Offer QR</span>
+              </div>
+            </div>
+
+            <div class="admin-selection-summary" id="admin-selection-summary">No student selected yet.</div>
+
+            <div class="form-group">
+              <label class="form-label">1. Select Student Reference</label>
+              <select id="admin-student-did" class="form-select" onchange="updateAdminSelectionSummary()">
+                <option value="">Select a student…</option>
+              </select>
+            </div>
+
+            <div class="form-group">
+              <label class="form-label">2. Select Credential Type</label>
+              <select id="admin-vc-type" class="form-select" onchange="updateAdminFields()">
+                <option value="UniversityDegreeCredential">University Degree</option>
+                <option value="InternshipCredential">Internship Certificate</option>
+                <option value="SkillBadgeCredential">Skill Badge</option>
+              </select>
+            </div>
+
+            <!-- Degree Fields -->
+            <div id="fields-degree" class="vc-fields">
+              <div class="form-group">
+                <label class="form-label">Degree <span style="color:var(--accent)">*</span></label>
+                <input type="text" id="admin-degree" class="form-input" placeholder="e.g. B.Tech, M.Tech, Ph.D" />
+              </div>
+              <div class="form-group">
+                <label class="form-label">Branch <span style="color:var(--accent)">*</span></label>
+                <input type="text" id="admin-branch" class="form-input" placeholder="e.g. Electrical Engineering" />
+              </div>
+              <div class="form-group">
+                <label class="form-label">Specialization <span style="color:var(--text-muted);font-weight:400">(optional)</span></label>
+                <input type="text" id="admin-specialization" class="form-input" placeholder="e.g. Machine Learning" />
+              </div>
+              <div class="form-group">
+                <label class="form-label">CGPA <span style="color:var(--accent)">*</span></label>
+                <input type="text" id="admin-cgpa" class="form-input" placeholder="e.g. 8.7" />
+              </div>
+              <div class="form-group">
+                <label class="form-label">Graduation Year <span style="color:var(--accent)">*</span></label>
+                <input type="number" id="admin-year" class="form-input" placeholder="2025" value="2025" />
+              </div>
+              <div class="form-group">
+                <label class="form-label">Honours <span style="color:var(--text-muted);font-weight:400">(optional)</span></label>
+                <input type="text" id="admin-honours" class="form-input" placeholder="e.g. With Distinction" />
+              </div>
+            </div>
+
+            <!-- Internship Fields -->
+            <div id="fields-internship" class="vc-fields" style="display:none;">
+              <div class="form-group">
+                <label class="form-label">Company Name <span style="color:var(--accent)">*</span></label>
+                <input type="text" id="admin-company" class="form-input" placeholder="e.g. Google, Microsoft" />
+              </div>
+              <div class="form-group">
+                <label class="form-label">Role <span style="color:var(--accent)">*</span></label>
+                <input type="text" id="admin-role" class="form-input" placeholder="e.g. Software Engineering Intern" />
+              </div>
+              <div class="form-group">
+                <label class="form-label">Duration <span style="color:var(--accent)">*</span></label>
+                <input type="text" id="admin-duration" class="form-input" placeholder="e.g. 3 Months, Summer 2024" />
+              </div>
+            </div>
+
+            <!-- Skill Badge Fields -->
+            <div id="fields-skill" class="vc-fields" style="display:none;">
+              <div class="form-group">
+                <label class="form-label">Skill Name <span style="color:var(--accent)">*</span></label>
+                <input type="text" id="admin-skill" class="form-input" placeholder="e.g. Python Expert, Cloud Architecture" />
+              </div>
+              <div class="form-group">
+                <label class="form-label">Proficiency Level <span style="color:var(--accent)">*</span></label>
+                <select id="admin-proficiency" class="form-select">
+                  <option value="Beginner">Beginner</option>
+                  <option value="Intermediate">Intermediate</option>
+                  <option value="Advanced">Advanced</option>
+                  <option value="Expert">Expert</option>
+                </select>
+              </div>
+            </div>
+
+            <button class="btn btn-primary" id="btn-issue-vc" style="margin-top:0.5rem;">Issue Credential</button>
+
+            <div id="qr-container" class="admin-qr-container" style="display:none;">
+              <div class="admin-qr-header">
+                <div class="admin-qr-title">Credential Offer Ready</div>
+                <button class="btn btn-outline btn-sm" type="button" onclick="copyOfferUrl()">Copy URL</button>
+              </div>
+              <div class="admin-qr-body">
+                <div id="qrcode" class="admin-qrcode"></div>
+                <div class="admin-offer-url mono" id="admin-offer-url">—</div>
+              </div>
+              <p class="admin-qr-help">Ask the student to scan with Altme or Paradym wallet.</p>
+            </div>
+          </section>
+        </div>
+
+        <details class="admin-advanced" id="admin-advanced-tools">
+          <summary>
+            <span>Advanced Tools</span>
+            <span class="admin-advanced-sub">Issuer document and session activity</span>
+          </summary>
+          <div class="admin-secondary-grid">
+            <section class="card admin-panel">
+              <div class="section-header admin-panel-header" style="margin-bottom:0.6rem;">
+                <div>
+                  <div class="section-title">Issuer DID Document</div>
+                  <div class="section-subtitle">Public verification material for all issued credentials</div>
+                </div>
+                <div class="admin-inline-actions">
+                  <button class="btn btn-outline btn-sm" type="button" onclick="copyIssuerDid('id')">Copy DID</button>
+                  <button class="btn btn-outline btn-sm" type="button" onclick="toggleIssuerDidPreview()" id="btn-issuer-toggle">Expand</button>
+                </div>
+              </div>
+              <div id="issuer-did-info" class="code-block admin-issuer-code">Loading...</div>
+            </section>
+
+            <section class="card admin-panel">
+              <div class="section-header admin-panel-header" style="margin-bottom:0.6rem;">
+                <div>
+                  <div class="section-title">Activity Log</div>
+                  <div class="section-subtitle">Recent admin actions in this session</div>
+                </div>
+              </div>
+              <div id="admin-activity-log" class="admin-activity-log"></div>
+            </section>
+          </div>
+        </details>
+
+        <section class="card admin-panel admin-ledger" id="admin-ledger-section">
+          <div class="section-header admin-panel-header">
+            <div>
+              <div class="section-title">Issued Credentials Ledger</div>
+              <div class="section-subtitle">Filter by type, status, and student</div>
+            </div>
+            <button class="btn btn-outline btn-sm" onclick="loadAdminIssuedVCs()">↻ Refresh</button>
+          </div>
+
+          <div class="admin-ledger-toolbar" id="admin-ledger-toolbar">
+            <input
+              type="text"
+              id="admin-issued-search"
+              class="form-input"
+              placeholder="Search by student, roll number, or summary"
+              oninput="handleAdminIssuedSearch(this.value)"
+            />
+            <select id="admin-issued-filter-type" class="form-select" onchange="handleAdminIssuedFilter()">
+              <option value="all">All Types</option>
+              <option value="UniversityDegreeCredential">University Degree</option>
+              <option value="InternshipCredential">Internship Certificate</option>
+              <option value="SkillBadgeCredential">Skill Badge</option>
+            </select>
+            <select id="admin-issued-filter-status" class="form-select" onchange="handleAdminIssuedFilter()">
+              <option value="all">All Statuses</option>
+              <option value="ISSUED">Issued</option>
+              <option value="PENDING">Pending</option>
+            </select>
+          </div>
+
+          <div id="admin-issued-summary-chips" class="admin-summary-chips"></div>
+          <div id="admin-issued-list"></div>
+        </section>
+      </div>
+    </div>
+
+    <!-- ═══ VERIFIER VIEW ═══ -->
+    <div id="view-verifier" class="view">
+      <nav class="navbar">
+        <a class="navbar-brand" href="#">
+          <img src="/static/logo.svg" alt="" class="logo-img"> IIT Hyderabad
+        </a>
+        <div class="navbar-right">
+          <span class="user-badge"><span class="dot"></span> Verifier</span>
+          <button class="btn btn-outline btn-sm" onclick="logout()">Sign Out</button>
+        </div>
+      </nav>
+
+      <div class="verifier-shell">
+        <div class="verifier-toprow">
+          <div>
+            <div class="verifier-breadcrumb">Verifier / Proof Requests</div>
+            <h2 class="verifier-title">Verifier Workspace</h2>
+            <p class="verifier-subtitle">Generate proof requests and review verification outcomes.</p>
+          </div>
+          <div class="verifier-top-actions">
+            <button class="btn btn-outline btn-sm verifier-hamburger-btn" type="button" onclick="toggleVerifierMenu()">☰ Menu</button>
+          </div>
+        </div>
+
+        <section class="workspace-hero workspace-hero--verifier">
+          <div class="workspace-hero__content">
+            <div class="workspace-hero__eyebrow">Proof Request Flow</div>
+            <h3 class="workspace-hero__title">Create cleaner verification sessions and review outcomes with confidence.</h3>
+            <p class="workspace-hero__text">Generate a wallet QR, watch the session resolve, and inspect credential details in a more deliberate verification experience.</p>
+            <div class="workspace-hero__actions">
+              <button class="btn btn-primary btn-sm" type="button" onclick="setVerifierScreen('verify')">New Request</button>
+              <button class="btn btn-outline btn-sm" type="button" onclick="setVerifierScreen('history')">Open History</button>
+              <button class="btn btn-outline btn-sm" type="button" onclick="toggleVerifierSection('legacy')">Toggle Manual Tool</button>
+            </div>
+          </div>
+          <div class="workspace-hero__rail">
+            <span class="workspace-hero__pill">Open or targeted proof</span>
+            <span class="workspace-hero__pill">Wallet scan workflow</span>
+            <span class="workspace-hero__pill">Session detail review</span>
+          </div>
+        </section>
+
+        <div id="verifier-menu-overlay" class="verifier-menu-overlay" onclick="closeVerifierMenu()"></div>
+        <aside id="verifier-menu-drawer" class="verifier-menu-drawer" aria-hidden="true">
+          <div class="verifier-menu-header">
+            <div class="verifier-menu-title">Verifier Menu</div>
+            <button class="btn btn-outline btn-sm" type="button" onclick="closeVerifierMenu()">Close</button>
+          </div>
+
+          <div class="verifier-menu-group">
+            <div class="verifier-menu-group-title">Focus View</div>
+            <button class="verifier-menu-link" type="button" onclick="setVerifierScreen('verify'); closeVerifierMenu();">Proof Request</button>
+            <button class="verifier-menu-link" type="button" onclick="setVerifierScreen('history'); closeVerifierMenu();">Verification History</button>
+            <button class="verifier-menu-link" type="button" onclick="setVerifierScreen('overview'); closeVerifierMenu();">Show All Sections</button>
+          </div>
+
+          <div class="verifier-menu-group">
+            <div class="verifier-menu-group-title">Tools</div>
+            <button class="verifier-menu-link" type="button" onclick="toggleVerifierSection('legacy')">Toggle Manual JWT Tool</button>
+          </div>
+
+          <div class="verifier-menu-group">
+            <div class="verifier-menu-group-title">Actions</div>
+            <button class="verifier-menu-link" type="button" onclick="loadVerifierStudents(); closeVerifierMenu();">Refresh Student Targets</button>
+            <button class="verifier-menu-link" type="button" onclick="loadVerifierHistory(); closeVerifierMenu();">Refresh History</button>
+          </div>
+        </aside>
+
+        <section id="verifier-tab-verify" class="card verifier-section active">
+          <div class="card-header">
+            <div class="card-icon blue">📱</div>
+            <div>
+              <div class="card-title">Request Proof via Wallet</div>
+              <div class="card-subtitle">Generate a verification QR and wait for the wallet response</div>
+            </div>
+          </div>
+
+          <div class="verifier-request-row">
+            <div class="form-group verifier-form-group">
+              <label class="form-label">Target Student (optional)</label>
+              <select id="verifier-student-select" class="form-select">
+                <option value="">Any student (open verification)</option>
+              </select>
+            </div>
+            <button class="btn btn-primary" id="btn-request-vp" onclick="initiateOID4VP()">
+              Generate Verification QR
+            </button>
+          </div>
+
+          <p class="verifier-note">Student scans this QR in wallet and submits proof back to your session.</p>
+
+          <div id="verifier-qr-container" class="verifier-qr-container" style="display:none;">
+            <div class="verifier-qr-title">Wallet Scan Required</div>
+            <div class="verifier-qr-sub">Ask the student to scan this QR and approve the proof request.</div>
+            <div id="verifier-qrcode" class="verifier-qrcode"></div>
+            <p id="verifier-scan-status" class="verifier-scan-status">
+              <span class="spinner"></span> Waiting for student scan...
+            </p>
+          </div>
+
+          <div id="verifier-result-card" class="verifier-result-card" style="display:none;"></div>
+        </section>
+
+        <section id="verifier-legacy-panel" class="card verifier-section verifier-hidden">
+          <div class="card-header">
+            <div class="card-icon rose">🔍</div>
+            <div>
+              <div class="card-title">Manual JWT Verification</div>
+              <div class="card-subtitle">Legacy fallback when wallet flow is unavailable</div>
+            </div>
+          </div>
+          <div class="form-group">
+            <label class="form-label">Verifiable Credential (JWT)</label>
+            <textarea id="verify-vc-jwt" class="form-input verifier-manual-textarea" rows="4" placeholder="eyJhbGciOiJFUzI1NiIs..."></textarea>
+          </div>
+          <div class="verifier-manual-actions">
+            <button class="btn btn-outline btn-sm" id="btn-verify-manual" onclick="verifyManual()">Verify Manual JWT</button>
+          </div>
+          <div id="verify-result" class="verifier-manual-result"></div>
+        </section>
+
+        <section id="verifier-tab-history" class="verifier-section verifier-hidden">
+          <div class="section-header">
+            <div>
+              <div class="section-title">Verification History</div>
+              <div class="section-subtitle">All verification sessions you've initiated</div>
+            </div>
+            <button class="btn btn-outline btn-sm" onclick="loadVerifierHistory()">↻ Refresh</button>
+          </div>
+          <div class="card" style="padding:0.5rem;">
+            <div id="verifier-history-list"></div>
+          </div>
+        </section>
+      </div>
+    </div>
+
+  </div>
+
+  <script src="/static/app.js?v=5"></script>
+</body>
+
+</html>

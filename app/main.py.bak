@@ -1,0 +1,173 @@
+"""IIT Hyderabad — FastAPI application entry point."""
+
+from fastapi import FastAPI
+from fastapi.middleware.cors import CORSMiddleware
+from fastapi.staticfiles import StaticFiles
+from fastapi.responses import FileResponse
+
+from app.database import engine, Base
+from app.crypto import generate_ec_key_pair, sign_presentation
+from app.routers import auth_router, student_router, did_router, admin_router, verify_router
+
+# Create all tables on startup
+Base.metadata.create_all(bind=engine)
+
+app = FastAPI(
+    title="IIT Hyderabad — DID & Verifiable Credentials",
+    description=(
+        "A FastAPI backend implementing Decentralized Identity (DID) and "
+        "Verifiable Credentials (VC) for a university portal. Supports student "
+        "authentication, DID creation, credential issuance, and a full "
+        "verification flow with Verifiable Presentations (VPs)."
+    ),
+    version="1.0.0",
+)
+
+# CORS — allow all origins for development
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["*"],
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
+
+# Register routers
+app.include_router(auth_router.router)
+app.include_router(student_router.router)
+app.include_router(did_router.router)
+app.include_router(admin_router.router)
+app.include_router(verify_router.router)
+
+
+# ── OID4VCI Well-Known Discovery Endpoints ────────────────────────────────
+
+@app.get("/.well-known/openid-credential-issuer", tags=["OID4VCI"])
+def get_oid4vci_metadata():
+    """Wallet discovery metadata for OpenID for Verifiable Credential Issuance (Draft 13+)."""
+    from app.config import DID_DOMAIN
+    base_url = f"https://{DID_DOMAIN}"
+    return {
+        "credential_issuer": base_url,
+        "credential_endpoint": f"{base_url}/admin/issue",
+        "token_endpoint": f"{base_url}/auth/token",
+        "display": [{"name": "IIT Hyderabad", "locale": "en"}],
+        "credential_configurations_supported": {
+            "UniversityDegreeCredential": {
+                "format": "jwt_vc_json",
+                "scope": "UniversityDegreeCredential",
+                "cryptographic_binding_methods_supported": ["did:web", "did:key"],
+                "credential_signing_alg_values_supported": ["ES256"],
+                "proof_types_supported": {
+                    "jwt": {
+                        "proof_signing_alg_values_supported": ["ES256"]
+                    }
+                },
+                "credential_definition": {
+                    "type": ["VerifiableCredential", "UniversityDegreeCredential"]
+                },
+                "display": [{"name": "University Degree", "locale": "en"}]
+            },
+            "InternshipCredential": {
+                "format": "jwt_vc_json",
+                "scope": "InternshipCredential",
+                "cryptographic_binding_methods_supported": ["did:web", "did:key"],
+                "credential_signing_alg_values_supported": ["ES256"],
+                "proof_types_supported": {
+                    "jwt": {
+                        "proof_signing_alg_values_supported": ["ES256"]
+                    }
+                },
+                "credential_definition": {
+                    "type": ["VerifiableCredential", "InternshipCredential"]
+                },
+                "display": [{"name": "Internship Certificate", "locale": "en"}]
+            },
+            "SkillBadgeCredential": {
+                "format": "jwt_vc_json",
+                "scope": "SkillBadgeCredential",
+                "cryptographic_binding_methods_supported": ["did:web", "did:key"],
+                "credential_signing_alg_values_supported": ["ES256"],
+                "proof_types_supported": {
+                    "jwt": {
+                        "proof_signing_alg_values_supported": ["ES256"]
+                    }
+                },
+                "credential_definition": {
+                    "type": ["VerifiableCredential", "SkillBadgeCredential"]
+                },
+                "display": [{"name": "Skill Badge", "locale": "en"}]
+            }
+        }
+    }
+
+@app.get("/.well-known/jwt-vc-issuer", tags=["OID4VCI"])
+def get_jwt_vc_issuer_metadata():
+    """Alternative standard discovery for wallets (EBSF/Walt.id)."""
+    return get_oid4vci_metadata()
+
+@app.get("/.well-known/openid-configuration", tags=["OID4VCI"])
+@app.get("/.well-known/oauth-authorization-server", tags=["OID4VCI"])
+def get_oidc_configuration():
+    """OIDC/OAuth discovery for wallets to find the token endpoint."""
+    from app.config import DID_DOMAIN
+    base_url = f"https://{DID_DOMAIN}"
+    return {
+        "issuer": base_url,
+        "authorization_endpoint": f"{base_url}/auth/authorize", # Not fully implemented, just a stub
+        "token_endpoint": f"{base_url}/auth/token",
+        "response_types_supported": ["code", "token"],
+        "grant_types_supported": ["authorization_code", "urn:ietf:params:oauth:grant-type:pre-authorized_code"],
+        "subject_types_supported": ["public"],
+        "id_token_signing_alg_values_supported": ["ES256", "RS256"]
+    }
+
+
+
+# ── Crypto helper endpoints (for frontend use) ───────────────────────────
+
+
+@app.post("/api/generate-keypair", tags=["Utilities"])
+def api_generate_keypair():
+    """Generate an EC P-256 key pair for the frontend.
+    Returns public_key_jwk and private_key_pem."""
+    public_jwk, private_pem = generate_ec_key_pair()
+    return {"public_key_jwk": public_jwk, "private_key_pem": private_pem}
+
+
+from pydantic import BaseModel
+
+
+class SignVPRequest(BaseModel):
+    private_key_pem: str
+    iss: str
+    nonce: str
+    vc_jwt: str
+
+
+@app.post("/api/sign-vp", tags=["Utilities"])
+def api_sign_vp(body: SignVPRequest):
+    """Sign a Verifiable Presentation JWT for the frontend.
+    In production, signing would happen client-side."""
+    vp_payload = {
+        "iss": body.iss,
+        "vp": {
+            "@context": ["https://www.w3.org/2018/credentials/v1"],
+            "type": ["VerifiablePresentation"],
+            "verifiableCredential": [body.vc_jwt],
+        },
+        "nonce": body.nonce,
+    }
+    vp_jwt = sign_presentation(vp_payload, body.private_key_pem)
+    return {"vp_jwt": vp_jwt}
+
+
+# ── Serve frontend ────────────────────────────────────────────────────────
+
+app.mount("/static", StaticFiles(directory="static"), name="static")
+
+
+@app.get("/", tags=["Root"])
+def root():
+    """Serve the frontend SPA."""
+    return FileResponse("static/index.html")
