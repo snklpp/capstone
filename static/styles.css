@@ -3234,3 +3234,436 @@ body.verifier-no-scroll {
 .badge-cert .badge-icon {
   filter: drop-shadow(0 0 10px rgba(255, 215, 0, 0.4));
 }
+
+/* ══════════════════════════════════════════════════════════════════════
+   MISSING STYLES — Login Quick-Access, Brand Panel extras, Workspace Hero
+   ══════════════════════════════════════════════════════════════════════ */
+
+/* ── Brand Panel — Eyebrow / Intro / Metrics ───────────────────────── */
+
+.login-brand__eyebrow {
+  font-size: 0.62rem;
+  font-weight: 700;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: rgba(232, 155, 121, 0.72);
+  margin-top: 0.35rem;
+}
+
+.login-brand__intro {
+  font-size: 0.82rem;
+  color: rgba(255, 255, 255, 0.52);
+  line-height: 1.55;
+  max-width: 36ch;
+}
+
+.login-brand__metrics {
+  display: flex;
+  gap: 1.4rem;
+  margin-top: 0.6rem;
+}
+
+.login-brand__metric {
+  display: flex;
+  flex-direction: column;
+  gap: 0.15rem;
+}
+
+.login-brand__metric-value {
+  font-size: 1.25rem;
+  font-weight: 800;
+  color: #ffffff;
+  letter-spacing: -0.02em;
+  line-height: 1;
+}
+
+.login-brand__metric-label {
+  font-size: 0.58rem;
+  font-weight: 600;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: rgba(255, 255, 255, 0.4);
+}
+
+@media (max-width: 768px) {
+  .login-brand__eyebrow { display: none; }
+  .login-brand__intro { display: none; }
+  .login-brand__metrics { display: none; }
+}
+
+@media (max-height: 860px) and (min-width: 769px) {
+  .login-brand__intro { display: none; }
+  .login-brand__metrics { gap: 1rem; margin-top: 0.4rem; }
+  .login-brand__metric-value { font-size: 1rem; }
+}
+
+/* ── Login Form — Eyebrow ──────────────────────────────────────────── */
+
+.login-form-eyebrow {
+  font-size: 0.58rem;
+  font-weight: 700;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--text-muted);
+  margin-bottom: 0.15rem;
+}
+
+/* ── Login Quick-Access Cards ──────────────────────────────────────── */
+
+.login-quick-access {
+  border: 1px solid #e7e9e4;
+  border-radius: 10px;
+  background: #f8f9f6;
+  padding: 0.85rem 0.8rem 0.7rem;
+}
+
+.login-quick-access__header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 0.5rem;
+  margin-bottom: 0.6rem;
+}
+
+.login-quick-access__title {
+  font-size: 0.76rem;
+  font-weight: 700;
+  color: var(--text-primary);
+  letter-spacing: -0.01em;
+}
+
+.login-quick-access__sub {
+  font-size: 0.68rem;
+  color: var(--text-muted);
+  margin-top: 0.1rem;
+  line-height: 1.35;
+}
+
+.login-quick-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 0.4rem;
+}
+
+.login-quick-card {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.2rem;
+  padding: 0.55rem 0.5rem;
+  border: 1px solid #e3e6e0;
+  border-radius: 8px;
+  background: #ffffff;
+  cursor: pointer;
+  transition: all 180ms ease;
+  font-family: inherit;
+  text-align: center;
+  position: relative;
+  overflow: hidden;
+}
+
+.login-quick-card::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  opacity: 0;
+  transition: opacity 180ms ease;
+  border-radius: 7px;
+}
+
+.login-quick-card:nth-child(1)::before { background: linear-gradient(135deg, rgba(31,74,74,0.04), rgba(31,74,74,0.08)); }
+.login-quick-card:nth-child(2)::before { background: linear-gradient(135deg, rgba(218,119,86,0.04), rgba(218,119,86,0.08)); }
+.login-quick-card:nth-child(3)::before { background: linear-gradient(135deg, rgba(45,122,79,0.04), rgba(45,122,79,0.08)); }
+.login-quick-card:nth-child(4)::before { background: linear-gradient(135deg, rgba(100,100,140,0.04), rgba(100,100,140,0.08)); }
+
+.login-quick-card:hover {
+  border-color: #c7cdc5;
+  transform: translateY(-1px);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
+}
+
+.login-quick-card:hover::before {
+  opacity: 1;
+}
+
+.login-quick-card:active {
+  transform: translateY(0);
+  box-shadow: none;
+}
+
+.login-quick-card__role {
+  position: relative;
+  z-index: 1;
+  font-size: 0.72rem;
+  font-weight: 700;
+  color: var(--text-primary);
+  letter-spacing: -0.01em;
+}
+
+.login-quick-card__cred {
+  position: relative;
+  z-index: 1;
+  font-size: 0.6rem;
+  font-family: 'JetBrains Mono', monospace;
+  color: var(--text-muted);
+  letter-spacing: 0.02em;
+}
+
+/* Color-coded left accent per role */
+.login-quick-card:nth-child(1) { border-left: 3px solid #1f4a4a; }
+.login-quick-card:nth-child(2) { border-left: 3px solid var(--accent); }
+.login-quick-card:nth-child(3) { border-left: 3px solid var(--success); }
+.login-quick-card:nth-child(4) { border-left: 3px solid #6366f1; }
+
+@media (max-width: 768px) {
+  .login-quick-grid {
+    grid-template-columns: 1fr 1fr;
+    gap: 0.35rem;
+  }
+  .login-quick-card {
+    padding: 0.45rem 0.4rem;
+  }
+}
+
+/* ── Workspace Hero Sections ───────────────────────────────────────── */
+
+.workspace-hero {
+  border-radius: 14px;
+  padding: 1.6rem 1.5rem 1.15rem;
+  position: relative;
+  overflow: hidden;
+}
+
+.workspace-hero::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background-image: radial-gradient(circle at 1px 1px, rgba(255,255,255,0.06) 1px, transparent 0);
+  background-size: 28px 28px;
+  pointer-events: none;
+}
+
+.workspace-hero::after {
+  content: '';
+  position: absolute;
+  top: -40%;
+  right: -10%;
+  width: 300px;
+  height: 300px;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.04);
+  pointer-events: none;
+}
+
+/* Student variant */
+.workspace-hero--student {
+  background: linear-gradient(135deg, #123233 0%, #1a4a4b 60%, #1f5556 100%);
+}
+
+/* Admin variant */
+.workspace-hero--admin {
+  background: linear-gradient(135deg, #2a1810 0%, #4a2c1a 60%, #5c3520 100%);
+}
+
+/* Verifier variant */
+.workspace-hero--verifier {
+  background: linear-gradient(135deg, #141830 0%, #1e2a52 60%, #253368 100%);
+}
+
+.workspace-hero__content {
+  position: relative;
+  z-index: 1;
+}
+
+.workspace-hero__eyebrow {
+  font-size: 0.58rem;
+  font-weight: 700;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: rgba(255, 255, 255, 0.45);
+  margin-bottom: 0.5rem;
+}
+
+.workspace-hero__title {
+  font-size: clamp(1.1rem, 2.2vw, 1.35rem);
+  font-weight: 700;
+  color: #ffffff;
+  letter-spacing: -0.02em;
+  line-height: 1.25;
+  max-width: 46ch;
+  margin-bottom: 0.45rem;
+}
+
+.workspace-hero__text {
+  font-size: 0.8rem;
+  color: rgba(255, 255, 255, 0.55);
+  line-height: 1.55;
+  max-width: 60ch;
+  margin-bottom: 0.85rem;
+}
+
+.workspace-hero__actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.45rem;
+}
+
+.workspace-hero__actions .btn-primary {
+  background: rgba(255, 255, 255, 0.15);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  color: #ffffff;
+  backdrop-filter: blur(8px);
+}
+
+.workspace-hero__actions .btn-primary:hover {
+  background: rgba(255, 255, 255, 0.22);
+  border-color: rgba(255, 255, 255, 0.35);
+}
+
+.workspace-hero__actions .btn-outline {
+  background: transparent;
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  color: rgba(255, 255, 255, 0.7);
+}
+
+.workspace-hero__actions .btn-outline:hover {
+  background: rgba(255, 255, 255, 0.08);
+  border-color: rgba(255, 255, 255, 0.28);
+  color: #ffffff;
+}
+
+.workspace-hero__rail {
+  position: relative;
+  z-index: 1;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.35rem;
+  margin-top: 0.85rem;
+}
+
+.workspace-hero__pill {
+  display: inline-flex;
+  align-items: center;
+  padding: 0.2rem 0.55rem;
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.06);
+  font-size: 0.6rem;
+  font-weight: 600;
+  letter-spacing: 0.04em;
+  color: rgba(255, 255, 255, 0.45);
+  text-transform: uppercase;
+}
+
+@media (max-width: 768px) {
+  .workspace-hero {
+    padding: 1.2rem 1rem 0.9rem;
+    border-radius: 10px;
+  }
+  .workspace-hero__title {
+    font-size: 1.05rem;
+  }
+  .workspace-hero__text {
+    font-size: 0.75rem;
+  }
+  .workspace-hero__rail {
+    display: none;
+  }
+}
+
+/* ── Workflow Strip (Admin Composer) ───────────────────────────────── */
+
+.workflow-strip {
+  display: flex;
+  gap: 0.4rem;
+  margin-bottom: 1rem;
+  padding: 0.55rem 0;
+  border-bottom: 1px solid var(--border);
+}
+
+.workflow-strip__item {
+  display: flex;
+  align-items: center;
+  gap: 0.45rem;
+  padding: 0.28rem 0.6rem;
+  border-radius: 999px;
+  background: #f6f7f4;
+  border: 1px solid var(--border);
+}
+
+.workflow-strip__step {
+  font-size: 0.58rem;
+  font-weight: 800;
+  color: var(--accent);
+  letter-spacing: 0.02em;
+}
+
+.workflow-strip__label {
+  font-size: 0.64rem;
+  font-weight: 600;
+  color: var(--text-secondary);
+  letter-spacing: 0.03em;
+  text-transform: uppercase;
+}
+
+/* ── Verifier History Table ────────────────────────────────────────── */
+
+.verifier-history-table {
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  overflow: hidden;
+}
+
+.verifier-history-table td,
+.verifier-history-table th {
+  font-size: 0.78rem;
+}
+
+/* ── Student History Table ─────────────────────────────────────────── */
+
+.student-history-table {
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  overflow: hidden;
+}
+
+.student-history-table td,
+.student-history-table th {
+  font-size: 0.78rem;
+}
+
+/* ── Global Polish — Subtle entry animations ───────────────────────── */
+
+.card {
+  animation: fadeUp 0.25s ease-out;
+}
+
+.stat-card {
+  transition: transform 180ms ease, box-shadow 180ms ease;
+}
+
+.stat-card:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.06);
+}
+
+/* Smoother navbar */
+.navbar {
+  animation: fadeIn 0.3s ease-out;
+}
+
+/* Better login form shadow on the inner card */
+.login-form-inner {
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.04);
+}
+
+.login-form-inner:hover {
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.06);
+  transition: box-shadow 300ms ease;
+}
+
+/* Pulse animation for the spinner in verifier scan status */
+.verifier-scan-status .spinner {
+  border-color: rgba(31, 74, 74, 0.2);
+  border-top-color: #1f4a4a;
+}
