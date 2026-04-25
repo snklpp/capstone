@@ -131,7 +131,8 @@ def admin_issue_vc_prepare(
     import json
     credential_offer_obj = {
         "credential_issuer": PUBLIC_BASE_URL,
-        "credential_configuration_ids": [body.vc_type],
+        "credential_configuration_ids": [body.vc_type],  # OID4VCI Draft 13
+        "credentials": [body.vc_type],                   # Draft 11/12 compat (older Altme)
         "grants": {
             "urn:ietf:params:oauth:grant-type:pre-authorized_code": {
                 "pre-authorized_code": pre_auth_code,

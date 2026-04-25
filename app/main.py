@@ -88,7 +88,9 @@ app.include_router(verify_router.router)
 
 # ── OID4VCI Well-Known Discovery Endpoints ────────────────────────────────
 
-_BINDING_METHODS = ["did:web"]
+# Include all binding methods wallets commonly use — did:key and did:jwk are
+# the default for Altme/Paradyme; did:web is our domain-bound student DID.
+_BINDING_METHODS = ["did:key", "did:jwk", "did:web"]
 
 
 @app.get("/.well-known/openid-credential-issuer", tags=["OID4VCI"])
@@ -113,7 +115,7 @@ def get_oid4vci_metadata():
         "credential_issuer": base_url,
         "credential_endpoint": f"{base_url}/admin/issue",
         "token_endpoint": f"{base_url}/auth/token",
-        "subject_syntax_types_supported": ["did:web"],
+        "subject_syntax_types_supported": ["did:key", "did:jwk", "did:web"],
         "display": issuer_display,
         "credential_configurations_supported": {
             "UniversityDegreeCredential": {
