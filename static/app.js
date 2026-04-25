@@ -201,6 +201,7 @@ function routeToView(username) {
     setStudentScreen('credentials');
     loadStudentData();
   } else if (role === 'admin') {
+    updateAdminIdentity(username);
     showView('view-admin');
     updateAdminFields();
     setAdminScreen('composer');
@@ -210,6 +211,120 @@ function routeToView(username) {
     setVerifierScreen('verify');
     loadVerifierStudents();
   }
+}
+
+function updateAdminIdentity(usernameFallback = '') {
+  const payload = token ? parseJwt(token) : {};
+  const name = payload.full_name || localStorage.getItem('adminFullName') || payload.username || usernameFallback || 'Admin';
+  const el = document.getElementById('admin-full-name');
+  if (el) el.textContent = name;
+}
+
+function setAdminCredType(type) {
+  const sel = document.getElementById('admin-vc-type');
+  if (sel) { sel.value = type; }
+  document.querySelectorAll('#aw-cred-type-tabs .aw-cred-type-tab').forEach(btn => {
+    btn.classList.toggle('active', btn.dataset.type === type);
+  });
+  updateAdminFields();
+}
+
+function updateAdminStepState() {
+  const studentSelected = !!document.getElementById('admin-student-did')?.value;
+  const qrVisible = document.getElementById('qr-container')?.style.display !== 'none';
+  const s1 = document.getElementById('aw-step-1');
+  const s2 = document.getElementById('aw-step-2');
+  const s3 = document.getElementById('aw-step-3');
+  if (s1) s1.classList.toggle('aw-stepper__item--done', studentSelected);
+  if (s2) {
+    s2.classList.toggle('aw-stepper__item--active', studentSelected);
+    s2.classList.toggle('aw-stepper__item--done', qrVisible);
+  }
+  if (s3) s3.classList.toggle('aw-stepper__item--active', qrVisible);
+}
+
+function updateAdminPreview() {
+  const host = document.getElementById('admin-preview-card');
+  if (!host) return;
+
+  const type = document.getElementById('admin-vc-type')?.value || 'UniversityDegreeCredential';
+  const studentSelect = document.getElementById('admin-student-did');
+  const studentLabel = studentSelect?.selectedIndex > 0
+    ? (studentSelect.options[studentSelect.selectedIndex]?.textContent || '').split('—').pop()?.trim()
+    : null;
+
+  const TYPE_COLORS = {
+    UniversityDegreeCredential: '#1A237E',
+    InternshipCredential: '#064e3b',
+    SkillBadgeCredential: '#92400e',
+  };
+  const TYPE_LABELS = {
+    UniversityDegreeCredential: 'University Degree',
+    InternshipCredential: 'Internship Certificate',
+    SkillBadgeCredential: 'Skill Badge',
+  };
+
+  const color = TYPE_COLORS[type] || '#1A237E';
+  const typeLabel = TYPE_LABELS[type] || type;
+  const fields = [];
+
+  if (type === 'UniversityDegreeCredential') {
+    const degree = document.getElementById('admin-degree')?.value;
+    const branch = document.getElementById('admin-branch')?.value;
+    const cgpa = document.getElementById('admin-cgpa')?.value;
+    const year = document.getElementById('admin-year')?.value;
+    const spec = document.getElementById('admin-specialization')?.value;
+    const honours = document.getElementById('admin-honours')?.value;
+    if (degree) fields.push(['Degree', degree]);
+    if (branch) fields.push(['Branch', branch]);
+    if (spec) fields.push(['Specialization', spec]);
+    if (cgpa) fields.push(['CGPA', cgpa]);
+    if (year) fields.push(['Year', year]);
+    if (honours) fields.push(['Honours', honours]);
+  } else if (type === 'InternshipCredential') {
+    const company = document.getElementById('admin-company')?.value;
+    const roleVal = document.getElementById('admin-role')?.value;
+    const duration = document.getElementById('admin-duration')?.value;
+    if (company) fields.push(['Company', company]);
+    if (roleVal) fields.push(['Role', roleVal]);
+    if (duration) fields.push(['Duration', duration]);
+  } else {
+    const skill = document.getElementById('admin-skill')?.value;
+    const prof = document.getElementById('admin-proficiency')?.value;
+    if (skill) fields.push(['Skill', skill]);
+    if (prof) fields.push(['Level', prof]);
+  }
+
+  if (!studentLabel && !fields.length) {
+    host.innerHTML = `
+      <div class="aw-preview-empty">
+        <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" style="color:#9CA3AF; margin-bottom:0.5rem;"><rect x="5" y="2" width="14" height="20" rx="2"/><line x1="9" y1="8" x2="15" y2="8"/><line x1="9" y1="12" x2="15" y2="12"/><line x1="9" y1="16" x2="12" y2="16"/></svg>
+        <div class="aw-preview-empty__text">Fill in the form to see a live preview</div>
+      </div>`;
+    return;
+  }
+
+  const fieldRows = fields.map(([k, v]) => `
+    <div class="aw-cred-mock__field">
+      <div class="aw-cred-mock__field-label">${k}</div>
+      <div class="aw-cred-mock__field-value">${v}</div>
+    </div>`).join('');
+
+  host.innerHTML = `
+    <div class="aw-cred-mock">
+      <div class="aw-cred-mock__header" style="background:${color};">
+        <div class="aw-cred-mock__header-badge">IIT Hyderabad</div>
+        <div class="aw-cred-mock__header-type">${typeLabel}</div>
+        ${studentLabel ? `<div class="aw-cred-mock__header-name">${studentLabel}</div>` : ''}
+      </div>
+      <div class="aw-cred-mock__body">
+        ${fieldRows || '<div style="grid-column:1/-1;padding:1rem;text-align:center;color:#9CA3AF;font-size:0.75rem;">Fill in credential fields</div>'}
+      </div>
+      <div class="aw-cred-mock__footer">
+        <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
+        IIT Hyderabad · W3C VC 2.0
+      </div>
+    </div>`;
 }
 
 function updateStudentIdentity(usernameFallback = '') {
@@ -1110,6 +1225,7 @@ function applyAdminVisibility() {
   setHidden('admin-kpi-strip', !view.kpi || adminState.hideKpi);
   setHidden('admin-directory-panel', !view.directory);
   setHidden('admin-composer-card', !view.composer);
+  setHidden('admin-preview-panel', !view.composer);
   setHidden('admin-ledger-section', !view.ledger);
   setHidden('admin-advanced-tools', !view.advanced);
 
@@ -1119,27 +1235,31 @@ function applyAdminVisibility() {
   setHidden('admin-issued-summary-chips', !view.ledger || filtersHidden);
 
   const grid = document.getElementById('admin-main-grid');
-  if (grid) {
-    const visibleCount = [view.directory, view.composer].filter(Boolean).length;
-    grid.classList.toggle('admin-main-grid--single', visibleCount <= 1);
-    grid.classList.toggle('admin-hidden', visibleCount === 0);
-  }
+  if (grid) grid.classList.toggle('admin-hidden', !view.composer);
 
   if (view.advanced) {
     const adv = document.getElementById('admin-advanced-tools');
     if (adv) adv.open = true;
   }
 
-  const menuBtn = document.querySelector('.admin-hamburger-btn');
-  if (menuBtn) {
+  const breadcrumb = document.getElementById('aw-breadcrumb-screen');
+  if (breadcrumb) {
     const labels = {
-      overview: 'Menu · Overview',
-      composer: 'Menu · Composer',
-      directory: 'Menu · Directory',
-      ledger: 'Menu · Ledger',
-      advanced: 'Menu · Advanced',
+      overview: 'Overview', composer: 'Credential Composer',
+      directory: 'Student Directory', ledger: 'Issued Ledger', advanced: 'Advanced Tools',
     };
-    menuBtn.textContent = `☰ ${labels[adminState.screen] || 'Menu'}`;
+    breadcrumb.textContent = labels[adminState.screen] || 'Credential Composer';
+  }
+
+  const kpiToggle = document.getElementById('aw-toggle-kpi');
+  if (kpiToggle) {
+    kpiToggle.classList.toggle('is-off', adminState.hideKpi);
+    kpiToggle.setAttribute('aria-checked', adminState.hideKpi ? 'false' : 'true');
+  }
+  const filtersToggle = document.getElementById('aw-toggle-filters');
+  if (filtersToggle) {
+    filtersToggle.classList.toggle('is-off', adminState.hideFilters);
+    filtersToggle.setAttribute('aria-checked', adminState.hideFilters ? 'false' : 'true');
   }
 }
 
@@ -1235,6 +1355,11 @@ function renderAdminKPIs() {
   set('admin-kpi-did', didReady);
   set('admin-kpi-pending', pending);
   set('admin-kpi-today', issuedToday);
+
+  const claimedTotal = issued.filter(v => (v.status || '').toUpperCase() === 'ISSUED').length;
+  set('aw-stat-issued-today', issuedToday);
+  set('aw-stat-pending', pending);
+  set('aw-stat-claimed', claimedTotal);
 }
 
 function setAdminStudentFilter(filter) {
@@ -1378,10 +1503,11 @@ function updateAdminSelectionSummary() {
 function updateAdminFields() {
   const type = document.getElementById('admin-vc-type').value;
   document.querySelectorAll('.vc-fields').forEach(el => el.style.display = 'none');
-  if (type === 'UniversityDegreeCredential') document.getElementById('fields-degree').style.display = 'block';
-  if (type === 'InternshipCredential') document.getElementById('fields-internship').style.display = 'block';
-  if (type === 'SkillBadgeCredential') document.getElementById('fields-skill').style.display = 'block';
+  if (type === 'UniversityDegreeCredential') document.getElementById('fields-degree').style.display = 'grid';
+  if (type === 'InternshipCredential') document.getElementById('fields-internship').style.display = 'grid';
+  if (type === 'SkillBadgeCredential') document.getElementById('fields-skill').style.display = 'grid';
   updateAdminSelectionSummary();
+  updateAdminPreview();
 }
 
 function copyOfferUrl() {
@@ -1455,6 +1581,7 @@ async function issueVC() {
 
     addAdminActivity('Credential offer generated', `${prettyVcType(vc_type)} for ${selectedLabel}`);
     toast('Credential offer generated successfully', 'success');
+    updateAdminStepState();
     loadAdminIssuedVCs();
   } catch (e) {
     toast(e.message, 'error');
