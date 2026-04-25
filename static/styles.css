@@ -1997,23 +1997,30 @@ body.student-no-scroll {
 }
 
 .student-cred-chip {
-  border: 1px solid var(--border);
-  background: #fafbf9;
-  color: var(--text-secondary);
-  border-radius: 999px;
-  padding: 0.18rem 0.56rem;
-  font-size: 0.64rem;
+  border: 1.5px solid #E2E8DC;
+  background: #ffffff;
+  color: #6B7280;
+  border-radius: 100px;
+  padding: 0.3rem 0.8rem;
+  font-size: 0.7rem;
   font-weight: 600;
-  letter-spacing: 0.04em;
-  text-transform: uppercase;
+  letter-spacing: 0.02em;
   cursor: pointer;
-  transition: all var(--transition);
+  transition: all 160ms ease;
+  font-family: inherit;
+}
+
+.student-cred-chip:hover {
+  border-color: #1B4D3E;
+  color: #1B4D3E;
+  background: rgba(27,77,62,0.04);
 }
 
 .student-cred-chip.active {
-  border-color: #1f4a4a;
-  background: rgba(31, 74, 74, 0.06);
-  color: #1f4a4a;
+  border-color: #1B4D3E;
+  background: #1B4D3E;
+  color: #ffffff;
+  box-shadow: 0 1px 4px rgba(27,77,62,0.22);
 }
 
 .student-queue-wrap {
@@ -2398,9 +2405,9 @@ body.student-no-scroll {
   box-shadow: var(--shadow-sm);
 }
 
-.sw-stat-card--coral {
-  border-left-color: #E07B4F;
-}
+.sw-stat-card--teal  { border-left-color: #1B4D3E; }
+.sw-stat-card--coral { border-left-color: #E07B4F; }
+.sw-stat-card--amber { border-left-color: #F59E0B; }
 
 .sw-stat-card__num {
   font-size: 2.05rem;
