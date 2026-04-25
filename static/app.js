@@ -196,7 +196,7 @@ function routeToView(username) {
   closeStudentMenu();
   closeVerifierMenu();
   if (role === 'student') {
-    document.getElementById('student-name').textContent = username || 'Student';
+    updateStudentIdentity(username);
     showView('view-student');
     setStudentScreen('credentials');
     loadStudentData();
@@ -210,6 +210,16 @@ function routeToView(username) {
     setVerifierScreen('verify');
     loadVerifierStudents();
   }
+}
+
+function updateStudentIdentity(usernameFallback = '') {
+  const payload = token ? parseJwt(token) : {};
+  const roll = payload.student_id || payload.username || usernameFallback || 'Student';
+  const fullName = payload.full_name || localStorage.getItem('studentFullName') || roll;
+  const nameEl = document.getElementById('student-full-name');
+  const rollEl = document.getElementById('student-name');
+  if (nameEl) nameEl.textContent = fullName;
+  if (rollEl) rollEl.textContent = roll;
 }
 
 function logout() {
@@ -287,11 +297,17 @@ function applyStudentVisibility() {
   };
   const view = map[studentState.screen] || map.credentials;
 
-  setHidden('student-summary-strip', studentState.hideSummary || studentState.screen !== 'overview');
+  setHidden('student-summary-strip', studentState.hideSummary);
   setHidden('student-tab-credentials', !view.credentials);
   setHidden('student-tab-challenges', !view.challenges);
   setHidden('student-tab-identity', !view.identity);
   setHidden('student-tab-history', !view.history);
+
+  const summaryToggle = document.getElementById('sw-toggle-summary');
+  if (summaryToggle) {
+    summaryToggle.classList.toggle('is-off', studentState.hideSummary);
+    summaryToggle.setAttribute('aria-checked', studentState.hideSummary ? 'false' : 'true');
+  }
 
   const menuBtn = document.querySelector('.student-hamburger-btn');
   if (menuBtn) {
@@ -304,6 +320,20 @@ function applyStudentVisibility() {
     };
     menuBtn.textContent = `☰ ${labels[studentState.screen] || 'Menu'}`;
   }
+}
+
+function setTextIfPresent(id, value) {
+  const el = document.getElementById(id);
+  if (el) el.textContent = value;
+}
+
+function updateStudentCredentialCounts(all = studentState.credentials || []) {
+  const pendingTotal = all.filter(v => v.status === 'PENDING').length;
+  const claimedTotal = all.length - pendingTotal;
+  setTextIfPresent('stat-vcs-pending', pendingTotal);
+  setTextIfPresent('stat-vcs', claimedTotal);
+  setTextIfPresent('sw-stat-pending-count', pendingTotal);
+  setTextIfPresent('sw-stat-claimed-count', claimedTotal);
 }
 
 function setStudentScreen(screen) {
@@ -421,33 +451,33 @@ function renderStudentCredentials() {
 
   const all = studentState.credentials || [];
   const vcs = getFilteredStudentCredentials(all);
-  document.getElementById('stat-vcs').textContent = all.length;
 
   const pendingTotal = all.filter(v => v.status === 'PENDING').length;
   const claimedTotal = all.length - pendingTotal;
+  updateStudentCredentialCounts(all);
 
   const pending = vcs.filter(v => v.status === 'PENDING');
   const claimed = vcs.filter(v => v.status !== 'PENDING');
 
-  const summaryHtml = `
-    <div class="student-cred-summary">
-      <span class="student-summary-pill">Total ${all.length}</span>
-      <span class="student-summary-pill">Pending ${pendingTotal}</span>
-      <span class="student-summary-pill">Claimed ${claimedTotal}</span>
-      <span class="student-summary-pill">Showing ${vcs.length}</span>
-    </div>`;
-
   if (!vcs.length) {
     const quickAction = studentState.credentialFilter === 'pending' && claimedTotal > 0
-      ? `<div class="student-empty-actions"><button class="btn btn-outline btn-sm" type="button" onclick="setStudentCredentialFilter('claimed')">View claimed credentials (${claimedTotal})</button></div>`
-      : '';
+      ? `<button class="student-cred-empty__cta" type="button" onclick="setStudentCredentialFilter('claimed')">View Claimed Credentials</button>`
+      : `<button class="student-cred-empty__cta" type="button" onclick="toast('Credential requests are routed through the Academic Records Office.', 'info')">Request Credential</button>`;
+    const emptyTitle = all.length ? 'No credentials match this view' : 'No credentials yet';
+    const emptyText = all.length
+      ? 'Try another filter or clear the search to see the rest of your wallet.'
+      : 'Your institution will issue credentials here';
 
-    host.innerHTML = `${summaryHtml}
-      <div class="empty-state">
-        <div class="icon">📜</div>
-        <p>No credentials match your filter</p>
-      </div>
-      ${quickAction}`;
+    host.innerHTML = `
+      <div class="student-cred-empty">
+        <div class="student-cred-empty__art" aria-hidden="true">
+          <div class="student-cred-empty__dots"></div>
+          <div class="student-cred-empty__card"></div>
+        </div>
+        <h3 class="student-cred-empty__title">${emptyTitle}</h3>
+        <p class="student-cred-empty__text">${emptyText}</p>
+        ${quickAction}
+      </div>`;
     return;
   }
 
@@ -532,7 +562,7 @@ function renderStudentCredentials() {
       </div>` : `<p class="student-collapsed-note">Claimed records are hidden by default to keep this view compact.</p>`}
     </div>` : '';
 
-  host.innerHTML = `${summaryHtml}${pendingHtml}${claimedHtml}`;
+  host.innerHTML = `${pendingHtml}${claimedHtml}`;
 }
 
 /* ── Student: Load Data ───────────────────────────────────────────────── */
@@ -541,7 +571,17 @@ async function loadStudentData() {
   await loadDID();
   await loadVCs();
   await loadChallenges();
+  await refreshStudentVerifiedCount();
   applyStudentVisibility();
+}
+
+async function refreshStudentVerifiedCount() {
+  try {
+    const sessions = await api('GET', '/students/verification-history');
+    setTextIfPresent('sw-stat-verified-count', sessions.filter(s => s.status === 'VERIFIED').length);
+  } catch {
+    setTextIfPresent('sw-stat-verified-count', '0');
+  }
 }
 
 async function loadDID() {
@@ -608,7 +648,7 @@ async function loadVCs() {
     renderStudentCredentials();
   } catch (e) {
     studentState.credentials = [];
-    document.getElementById('stat-vcs').textContent = '0';
+    updateStudentCredentialCounts([]);
     document.getElementById('vc-list').innerHTML = `<div class="empty-state"><p>${e.message}</p></div>`;
   }
 }
@@ -854,7 +894,8 @@ async function downloadCertificateImage() {
 async function loadChallenges() {
   try {
     const challenges = await api('GET', '/students/challenges');
-    document.getElementById('stat-challenges').textContent = challenges.length;
+    setTextIfPresent('stat-challenges', challenges.length);
+    setTextIfPresent('sw-stat-verified-count', '0');
 
     if (challenges.length === 0) {
       document.getElementById('challenge-list').innerHTML = `
@@ -921,6 +962,7 @@ async function respondToChallenge(verificationId, nonce) {
 async function loadStudentHistory() {
   try {
     const sessions = await api('GET', '/students/verification-history');
+    setTextIfPresent('sw-stat-verified-count', sessions.filter(s => s.status === 'VERIFIED').length);
     if (sessions.length === 0) {
       document.getElementById('student-history-list').innerHTML = `
         <div class="empty-state"><div class="icon">📋</div><p>No verification history yet</p></div>`;

@@ -7,7 +7,7 @@
   <title>IIT Hyderabad — Verifiable Credentials</title>
   <meta name="description"
     content="Decentralized Identity and Verifiable Credentials management for university students, admins, and verifiers." />
-  <link rel="stylesheet" href="/static/styles.css?v=7" />
+  <link rel="stylesheet" href="/static/styles.css?v=8" />
   <link rel="icon" href="/static/logo.svg" type="image/svg+xml" />
   <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
@@ -204,88 +204,149 @@
 
     <!-- ═══ STUDENT VIEW ═══ -->
     <div id="view-student" class="view">
-      <nav class="navbar">
-        <a class="navbar-brand" href="#">
-          <img src="/static/logo.svg" alt="" class="logo-img"> IIT Hyderabad
-        </a>
-        <div class="navbar-right">
-          <span class="user-badge"><span class="dot"></span> <span id="student-name"></span></span>
-          <button class="btn btn-outline btn-sm" onclick="logout()">Sign Out</button>
+
+      <!-- ── Navbar ── -->
+      <nav class="sw-navbar">
+        <div class="sw-navbar__left">
+          <img src="/static/logo.svg" alt="IIT Hyderabad" class="sw-navbar__logo" />
+          <span class="sw-navbar__brand">IIT Hyderabad</span>
+        </div>
+        <nav class="sw-breadcrumb" aria-label="Breadcrumb">
+          <span class="sw-breadcrumb__item">Student</span>
+          <svg class="sw-breadcrumb__sep" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" aria-hidden="true"><polyline points="9 18 15 12 9 6"/></svg>
+          <span class="sw-breadcrumb__item sw-breadcrumb__item--active">Credential Wallet</span>
+        </nav>
+        <div class="sw-navbar__right">
+          <div class="sw-avatar-chip">
+            <div class="sw-avatar-chip__orb" aria-hidden="true">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="8" r="4"/><path d="M4 20c0-4 3.6-7 8-7s8 3 8 7"/></svg>
+            </div>
+            <div class="sw-avatar-chip__text">
+              <span class="sw-avatar-chip__name" id="student-full-name">Student</span>
+              <span class="sw-avatar-chip__roll" id="student-name">—</span>
+            </div>
+          </div>
+          <button class="sw-icon-btn" aria-label="Notifications" title="Notifications">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/></svg>
+          </button>
+          <button class="sw-signout-btn" onclick="logout()">Sign Out</button>
         </div>
       </nav>
 
-      <div class="student-shell">
-        <div class="student-toprow">
-          <div>
-            <div class="student-breadcrumb">Student / Credential Wallet</div>
-            <h2 class="student-title">Student Workspace</h2>
-            <p class="student-subtitle">Claim credentials, respond to verification requests, and track trust history.</p>
-          </div>
-          <div class="student-top-actions">
-            <button class="btn btn-outline btn-sm student-hamburger-btn" type="button" onclick="toggleStudentMenu()">☰ Menu</button>
-          </div>
-        </div>
+      <!-- ── Scrollable shell ── -->
+      <div class="sw-shell">
 
-        <section class="workspace-hero workspace-hero--student">
-          <div class="workspace-hero__content">
-            <div class="workspace-hero__eyebrow">Wallet Experience</div>
-            <h3 class="workspace-hero__title">Everything a student needs, without interface noise.</h3>
-            <p class="workspace-hero__text">Review claimable credentials first, keep your identity status visible, and respond to verifier requests from a calmer, more premium workspace.</p>
-            <div class="workspace-hero__actions">
-              <button class="btn btn-primary btn-sm" type="button" onclick="setStudentScreen('credentials')">Open Credentials</button>
-              <button class="btn btn-outline btn-sm" type="button" onclick="setStudentScreen('challenges')">Review Requests</button>
-              <button class="btn btn-outline btn-sm" type="button" onclick="setStudentScreen('identity')">View Identity</button>
+        <!-- ── Hero Banner ── -->
+        <section class="sw-hero">
+          <div class="sw-hero__body">
+            <div class="sw-hero__left">
+              <h2 class="sw-hero__heading">Your Credential Wallet</h2>
+              <div class="sw-hero__pills">
+                <span class="sw-hero__pill">
+                  <span aria-hidden="true">⬡</span>
+                  <span id="sw-stat-pending-count">0</span> Pending
+                </span>
+                <span class="sw-hero__pill sw-hero__pill--claimed">
+                  <span aria-hidden="true">✓</span>
+                  <span id="sw-stat-claimed-count">0</span> Claimed
+                </span>
+                <span class="sw-hero__pill sw-hero__pill--verified">
+                  <span aria-hidden="true">↗</span>
+                  <span id="sw-stat-verified-count">0</span> Verified
+                </span>
+              </div>
+            </div>
+            <div class="sw-hero__right">
+              <button class="sw-hero__action" type="button" onclick="setStudentScreen('credentials')">Open Credentials</button>
+              <button class="sw-hero__action" type="button" onclick="setStudentScreen('challenges')">Review Requests</button>
+              <button class="sw-hero__action" type="button" onclick="setStudentScreen('identity')">View Identity</button>
             </div>
           </div>
-          <div class="workspace-hero__rail">
-            <span class="workspace-hero__pill">Pending claims first</span>
-            <span class="workspace-hero__pill">Wallet-bound DID</span>
-            <span class="workspace-hero__pill">Verifier history</span>
+          <div class="sw-hero__footer">
+            <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" aria-hidden="true"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
+            Wallet-bound DID &nbsp;·&nbsp; OID4VC Ready
           </div>
         </section>
 
-        <div id="student-menu-overlay" class="student-menu-overlay" onclick="closeStudentMenu()"></div>
-        <aside id="student-menu-drawer" class="student-menu-drawer" aria-hidden="true">
-          <div class="student-menu-header">
-            <div class="student-menu-title">Student Menu</div>
-            <button class="btn btn-outline btn-sm" type="button" onclick="closeStudentMenu()">Close</button>
+        <!-- ── Stat Cards Row ── -->
+        <div class="sw-stats-row" id="student-summary-strip">
+          <div class="sw-stat-card sw-stat-card--teal">
+            <div class="sw-stat-card__num" id="stat-vcs-pending">0</div>
+            <div class="sw-stat-card__label">Pending Claims</div>
+            <div class="sw-stat-card__trend">
+              <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" aria-hidden="true"><polyline points="18 15 12 9 6 15"/></svg>
+              awaiting action
+            </div>
+          </div>
+          <div class="sw-stat-card sw-stat-card--coral">
+            <div class="sw-stat-card__num" id="stat-vcs">0</div>
+            <div class="sw-stat-card__label">Claimed Credentials</div>
+            <div class="sw-stat-card__trend">
+              <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" aria-hidden="true"><polyline points="18 15 12 9 6 15"/></svg>
+              in wallet
+            </div>
+          </div>
+          <div class="sw-stat-card sw-stat-card--teal">
+            <div class="sw-stat-card__num" id="stat-challenges">0</div>
+            <div class="sw-stat-card__label">Verification Requests</div>
+            <div class="sw-stat-card__trend">
+              <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" aria-hidden="true"><polyline points="18 15 12 9 6 15"/></svg>
+              this session
+            </div>
+          </div>
+        </div>
+        <span id="stat-did" style="display:none;"></span>
+
+        <!-- ── Slide-over Drawer ── -->
+        <div id="student-menu-overlay" class="sw-drawer-overlay" onclick="closeStudentMenu()"></div>
+        <aside id="student-menu-drawer" class="sw-drawer" aria-hidden="true">
+          <div class="sw-drawer__header">
+            <span class="sw-drawer__title">Student Menu</span>
+            <button class="sw-drawer__close" type="button" onclick="closeStudentMenu()" aria-label="Close menu">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+            </button>
           </div>
 
-          <div class="student-menu-group">
-            <div class="student-menu-group-title">Focus View</div>
-            <button class="student-menu-link" type="button" onclick="setStudentScreen('credentials'); closeStudentMenu();">Credentials</button>
-            <button class="student-menu-link" type="button" onclick="setStudentScreen('challenges'); closeStudentMenu();">Verification Requests</button>
-            <button class="student-menu-link" type="button" onclick="setStudentScreen('identity'); closeStudentMenu();">My Identity</button>
-            <button class="student-menu-link" type="button" onclick="setStudentScreen('history'); closeStudentMenu();">Verification History</button>
-            <button class="student-menu-link" type="button" onclick="setStudentScreen('overview'); closeStudentMenu();">Show All Sections</button>
+          <div class="sw-drawer__section">
+            <div class="sw-drawer__section-label">FOCUS VIEW</div>
+            <button class="sw-drawer__item" type="button" onclick="setStudentScreen('credentials'); closeStudentMenu();">
+              <svg class="sw-drawer__item-icon" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="5" y="2" width="14" height="20" rx="2"/><line x1="9" y1="8" x2="15" y2="8"/><line x1="9" y1="12" x2="15" y2="12"/></svg>
+              Credentials
+            </button>
+            <button class="sw-drawer__item" type="button" onclick="setStudentScreen('challenges'); closeStudentMenu();">
+              <svg class="sw-drawer__item-icon" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg>
+              Verification Requests
+            </button>
+            <button class="sw-drawer__item" type="button" onclick="setStudentScreen('identity'); closeStudentMenu();">
+              <svg class="sw-drawer__item-icon" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+              My Identity
+            </button>
+            <button class="sw-drawer__item" type="button" onclick="setStudentScreen('history'); closeStudentMenu();">
+              <svg class="sw-drawer__item-icon" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+              Verification History
+            </button>
           </div>
 
-          <div class="student-menu-group">
-            <div class="student-menu-group-title">Density</div>
-            <button class="student-menu-link" type="button" onclick="toggleStudentSection('summary')">Toggle Summary Strip</button>
+          <div class="sw-drawer__section">
+            <div class="sw-drawer__section-label">DENSITY</div>
+            <div class="sw-toggle-row">
+              <span class="sw-toggle-label">Summary Strip</span>
+              <button type="button" class="sw-toggle" id="sw-toggle-summary" role="switch" aria-checked="true" onclick="toggleStudentSection('summary')" aria-label="Toggle summary strip">
+                <span class="sw-toggle__thumb"></span>
+              </button>
+            </div>
           </div>
 
-          <div class="student-menu-group">
-            <div class="student-menu-group-title">Actions</div>
-            <button class="student-menu-link" type="button" onclick="loadStudentData(); closeStudentMenu();">Refresh All</button>
+          <div class="sw-drawer__section">
+            <div class="sw-drawer__section-label">ACTIONS</div>
+            <button class="sw-drawer__refresh-btn" type="button" onclick="loadStudentData(); closeStudentMenu();">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M23 4v6h-6"/><path d="M1 20v-6h6"/><path d="M3.51 9a9 9 0 0 1 14.85-3.36L23 10"/><path d="M20.49 15a9 9 0 0 1-14.85 3.36L1 14"/></svg>
+              Refresh All
+            </button>
           </div>
         </aside>
 
-        <div class="stats-grid student-summary-strip" id="student-summary-strip">
-          <div class="stat-card">
-            <div class="stat-value" id="stat-did">—</div>
-            <div class="stat-label">DID Status</div>
-          </div>
-          <div class="stat-card">
-            <div class="stat-value" id="stat-vcs">0</div>
-            <div class="stat-label">Credentials</div>
-          </div>
-          <div class="stat-card">
-            <div class="stat-value" id="stat-challenges">0</div>
-            <div class="stat-label">Challenges</div>
-          </div>
-        </div>
-
+        <!-- ── Credentials Panel ── -->
         <section id="student-tab-credentials" class="card student-section active">
           <div class="card-header" style="justify-content:space-between; align-items:center;">
             <div style="display:flex; align-items:center; gap:0.75rem;">
@@ -295,18 +356,27 @@
                 <div class="card-subtitle">Review pending offers first, open full records only when needed</div>
               </div>
             </div>
-            <button class="btn btn-outline btn-sm" onclick="loadVCs()" title="Refresh Credentials">↻ Refresh</button>
+            <div style="display:flex;gap:0.5rem;align-items:center;">
+              <button class="btn btn-outline btn-sm" onclick="loadVCs()" title="Refresh Credentials">↻</button>
+              <button class="btn btn-outline btn-sm" type="button" onclick="toggleStudentMenu()">☰ Menu</button>
+            </div>
           </div>
 
-          <div class="student-cred-controls" id="student-cred-controls">
-            <input
-              type="text"
-              id="student-cred-search"
-              class="form-input"
-              placeholder="Search by type or credential summary"
-              oninput="handleStudentCredentialSearch(this.value)"
-            />
-            <div class="student-cred-filters" id="student-cred-filters">
+          <div class="sw-cred-controls" id="student-cred-controls">
+            <div class="sw-search-wrap">
+              <svg class="sw-search-icon" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+              <input
+                type="text"
+                id="student-cred-search"
+                class="sw-search-input"
+                placeholder="Search by type or credential summary"
+                oninput="handleStudentCredentialSearch(this.value)"
+              />
+              <button type="button" class="sw-filter-btn" title="Filter options">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="22 3 2 3 10 12.46 10 19 14 21 14 12.46 22 3"/></svg>
+              </button>
+            </div>
+            <div class="sw-filter-tabs" id="student-cred-filters">
               <button type="button" class="student-cred-chip active" data-filter="pending" onclick="setStudentCredentialFilter('pending')">Pending</button>
               <button type="button" class="student-cred-chip" data-filter="claimed" onclick="setStudentCredentialFilter('claimed')">Claimed</button>
               <button type="button" class="student-cred-chip" data-filter="all" onclick="setStudentCredentialFilter('all')">All</button>
@@ -319,6 +389,7 @@
           <div id="vc-list"></div>
         </section>
 
+        <!-- ── Verification Requests ── -->
         <section id="student-tab-challenges" class="card student-section">
           <div class="card-header" style="justify-content:space-between; align-items:center;">
             <div style="display:flex; align-items:center; gap:0.75rem;">
@@ -333,6 +404,7 @@
           <div id="challenge-list"></div>
         </section>
 
+        <!-- ── My Identity ── -->
         <section id="student-tab-identity" class="card student-section">
           <div class="card-header">
             <div class="card-icon purple">🔑</div>
@@ -348,6 +420,7 @@
           </div>
         </section>
 
+        <!-- ── Verification History ── -->
         <section id="student-tab-history" class="student-section">
           <div class="section-header">
             <div>
@@ -360,7 +433,8 @@
             <div id="student-history-list"></div>
           </div>
         </section>
-      </div>
+
+      </div><!-- /.sw-shell -->
     </div>
 
     <!-- ═══ ADMIN VIEW ═══ -->
@@ -806,7 +880,7 @@
 
   </div>
 
-  <script src="/static/app.js?v=5"></script>
+  <script src="/static/app.js?v=6"></script>
 </body>
 
 </html>

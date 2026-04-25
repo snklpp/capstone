@@ -22,7 +22,13 @@ def login(body: LoginRequest, db: Session = Depends(get_db)):
         )
 
     token = create_access_token(
-        data={"sub": user.id, "role": user.role, "student_id": user.student_id}
+        data={
+            "sub": user.id,
+            "role": user.role,
+            "student_id": user.student_id,
+            "username": user.username,
+            "full_name": user.full_name,
+        }
     )
     return TokenResponse(access_token=token)
 
