@@ -110,12 +110,13 @@ def get_oid4vci_metadata():
         "credential_issuer": base_url,
         "credential_endpoint": f"{base_url}/admin/issue",
         "token_endpoint": f"{base_url}/auth/token",
+        "subject_syntax_types_supported": ["did:web"],
         "display": issuer_display,
         "credential_configurations_supported": {
             "UniversityDegreeCredential": {
                 "format": "jwt_vc_json",
                 "scope": "UniversityDegreeCredential",
-                "cryptographic_binding_methods_supported": ["did:web", "did:key"],
+                "cryptographic_binding_methods_supported": ["did:web"],
                 "credential_signing_alg_values_supported": ["ES256"],
                 "proof_types_supported": {"jwt": {"proof_signing_alg_values_supported": ["ES256"]}},
                 "credential_definition": {
@@ -151,7 +152,7 @@ def get_oid4vci_metadata():
             "InternshipCredential": {
                 "format": "jwt_vc_json",
                 "scope": "InternshipCredential",
-                "cryptographic_binding_methods_supported": ["did:web", "did:key"],
+                "cryptographic_binding_methods_supported": ["did:web"],
                 "credential_signing_alg_values_supported": ["ES256"],
                 "proof_types_supported": {"jwt": {"proof_signing_alg_values_supported": ["ES256"]}},
                 "credential_definition": {
@@ -180,7 +181,7 @@ def get_oid4vci_metadata():
             "SkillBadgeCredential": {
                 "format": "jwt_vc_json",
                 "scope": "SkillBadgeCredential",
-                "cryptographic_binding_methods_supported": ["did:web", "did:key"],
+                "cryptographic_binding_methods_supported": ["did:web"],
                 "credential_signing_alg_values_supported": ["ES256"],
                 "proof_types_supported": {"jwt": {"proof_signing_alg_values_supported": ["ES256"]}},
                 "credential_definition": {

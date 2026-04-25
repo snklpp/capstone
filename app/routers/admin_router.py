@@ -25,6 +25,16 @@ _KEY_FILE = os.path.join(os.path.dirname(__file__), "..", "..", "issuer_key.pem"
 _JWK_FILE = os.path.join(os.path.dirname(__file__), "..", "..", "issuer_key.jwk")
 
 def _load_or_create_issuer_key():
+    # Prefer env vars (production / Render deployment)
+    pem_b64 = os.environ.get("ISSUER_PRIVATE_KEY_B64")
+    jwk_env = os.environ.get("ISSUER_PUBLIC_JWK")
+    if pem_b64 and jwk_env:
+        import base64 as _b64
+        private_pem = _b64.b64decode(pem_b64).decode()
+        public_jwk = _json.loads(jwk_env)
+        print("[ISSUER] Loaded issuer key from environment variables")
+        return public_jwk, private_pem
+
     key_file = os.path.abspath(_KEY_FILE)
     jwk_file = os.path.abspath(_JWK_FILE)
     if os.path.exists(key_file) and os.path.exists(jwk_file):

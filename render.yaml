@@ -7,10 +7,20 @@ services:
     startCommand: python -m app.seed && uvicorn app.main:app --host 0.0.0.0 --port $PORT
     envVars:
       - key: DATABASE_URL
-        value: sqlite:///./university_portal.db
+        fromDatabase:
+          name: university-portal-db
+          property: connectionString
       - key: SECRET_KEY
         generateValue: true
       - key: PUBLIC_BASE_URL
-        sync: false # You will manually update this once the URL is assigned
+        sync: false
       - key: DID_DOMAIN
-        value: university-portal.onrender.com # Default, can be changed
+        value: university-portal.onrender.com
+      - key: ISSUER_PRIVATE_KEY_B64
+        sync: false
+      - key: ISSUER_PUBLIC_JWK
+        sync: false
+
+databases:
+  - name: university-portal-db
+    plan: free
