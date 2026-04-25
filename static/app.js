@@ -80,20 +80,32 @@ function parseJwt(t) {
 /* ── Auth tabs ────────────────────────────────────────────────────────── */
 
 function switchAuthTab(tab) {
-  document.getElementById('tab-login').classList.toggle('active', tab === 'login');
-  document.getElementById('tab-register').classList.toggle('active', tab === 'register');
-  document.getElementById('auth-login').style.display = tab === 'login' ? 'block' : 'none';
-  document.getElementById('auth-register').style.display = tab === 'register' ? 'block' : 'none';
-  const heading = document.getElementById('login-form-heading');
-  if (heading) {
-    if (tab === 'login') {
-      heading.querySelector('.login-form-title').textContent = 'Welcome back';
-      heading.querySelector('.login-form-sub').textContent = 'Sign in to your institutional account';
-    } else {
-      heading.querySelector('.login-form-title').textContent = 'Create account';
-      heading.querySelector('.login-form-sub').textContent = 'Register to access your credentials';
-    }
-  }
+  const isLogin = tab === 'login';
+  document.getElementById('tab-login').classList.toggle('active', isLogin);
+  document.getElementById('tab-register').classList.toggle('active', !isLogin);
+  document.getElementById('tab-login').setAttribute('aria-selected', isLogin);
+  document.getElementById('tab-register').setAttribute('aria-selected', !isLogin);
+  document.getElementById('auth-login').style.display = isLogin ? 'block' : 'none';
+  document.getElementById('auth-register').style.display = isLogin ? 'none' : 'block';
+  const pill = document.getElementById('auth-toggle-pill');
+  if (pill) pill.classList.toggle('at-register', !isLogin);
+  const title = document.getElementById('login-card-title');
+  if (title) title.textContent = isLogin ? 'Welcome back' : 'Create account';
+}
+
+function updatePasswordStrength(val) {
+  const bar = document.getElementById('pw-strength-bar');
+  if (!bar) return;
+  let score = 0;
+  if (val.length >= 6) score++;
+  if (val.length >= 10) score++;
+  if (/[A-Z]/.test(val)) score++;
+  if (/[0-9]/.test(val)) score++;
+  if (/[^A-Za-z0-9]/.test(val)) score++;
+  const widths  = ['0%', '20%', '40%', '65%', '85%', '100%'];
+  const colors  = ['#E07B4F', '#E07B4F', '#F59E0B', '#10B981', '#1B4D3E', '#1B4D3E'];
+  bar.style.width = widths[score];
+  bar.style.backgroundColor = colors[score];
 }
 
 function selectRole(r) {
@@ -147,17 +159,7 @@ async function login() {
 function updateRegFormLabels() {
   const r = document.getElementById('reg-role').value;
   const label = document.getElementById('reg-roll-label');
-  const input = document.getElementById('reg-roll');
-  if (r === 'student') {
-    label.textContent = 'Roll Number';
-    input.placeholder = 'e.g. 2022CS101';
-  } else if (r === 'admin') {
-    label.textContent = 'Username';
-    input.placeholder = 'e.g. admin';
-  } else {
-    label.textContent = 'Username';
-    input.placeholder = 'e.g. verifier1';
-  }
+  label.textContent = r === 'student' ? 'Roll Number' : 'Username';
 }
 
 async function register() {

@@ -7,7 +7,7 @@
   <title>IIT Hyderabad — Verifiable Credentials</title>
   <meta name="description"
     content="Decentralized Identity and Verifiable Credentials management for university students, admins, and verifiers." />
-  <link rel="stylesheet" href="/static/styles.css?v=6" />
+  <link rel="stylesheet" href="/static/styles.css?v=7" />
   <link rel="icon" href="/static/logo.svg" type="image/svg+xml" />
   <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
@@ -25,6 +25,36 @@
 
         <!-- ── Brand Panel (Left) ── -->
         <div class="login-brand">
+          <!-- Node-graph SVG motif -->
+          <svg class="login-brand__mesh" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 500 700" preserveAspectRatio="xMidYMid slice" aria-hidden="true">
+            <line x1="45" y1="90" x2="165" y2="175" stroke="rgba(255,255,255,0.07)" stroke-width="1"/>
+            <line x1="165" y1="175" x2="290" y2="75" stroke="rgba(255,255,255,0.07)" stroke-width="1"/>
+            <line x1="290" y1="75" x2="430" y2="130" stroke="rgba(255,255,255,0.07)" stroke-width="1"/>
+            <line x1="430" y1="130" x2="390" y2="290" stroke="rgba(255,255,255,0.05)" stroke-width="1"/>
+            <line x1="390" y1="290" x2="460" y2="415" stroke="rgba(255,255,255,0.05)" stroke-width="1"/>
+            <line x1="85" y1="350" x2="165" y2="175" stroke="rgba(255,255,255,0.06)" stroke-width="1"/>
+            <line x1="85" y1="350" x2="225" y2="435" stroke="rgba(255,255,255,0.07)" stroke-width="1"/>
+            <line x1="225" y1="435" x2="460" y2="415" stroke="rgba(255,255,255,0.05)" stroke-width="1"/>
+            <line x1="225" y1="435" x2="170" y2="565" stroke="rgba(255,255,255,0.06)" stroke-width="1"/>
+            <line x1="170" y1="565" x2="65" y2="625" stroke="rgba(255,255,255,0.05)" stroke-width="1"/>
+            <line x1="170" y1="565" x2="325" y2="605" stroke="rgba(255,255,255,0.06)" stroke-width="1"/>
+            <line x1="325" y1="605" x2="450" y2="625" stroke="rgba(255,255,255,0.05)" stroke-width="1"/>
+            <line x1="450" y1="625" x2="460" y2="415" stroke="rgba(255,255,255,0.05)" stroke-width="1"/>
+            <line x1="165" y1="175" x2="390" y2="290" stroke="rgba(255,255,255,0.04)" stroke-width="1"/>
+            <circle cx="45" cy="90" r="3.5" fill="rgba(255,255,255,0.18)"/>
+            <circle cx="165" cy="175" r="5" fill="rgba(255,255,255,0.14)"/>
+            <circle cx="290" cy="75" r="3" fill="rgba(255,255,255,0.16)"/>
+            <circle cx="430" cy="130" r="4" fill="rgba(255,255,255,0.12)"/>
+            <circle cx="390" cy="290" r="3" fill="rgba(255,255,255,0.1)"/>
+            <circle cx="460" cy="415" r="4.5" fill="rgba(255,255,255,0.12)"/>
+            <circle cx="85" cy="350" r="3" fill="rgba(255,255,255,0.15)"/>
+            <circle cx="225" cy="435" r="5.5" fill="rgba(255,255,255,0.1)"/>
+            <circle cx="170" cy="565" r="3" fill="rgba(255,255,255,0.12)"/>
+            <circle cx="65" cy="625" r="2.5" fill="rgba(255,255,255,0.1)"/>
+            <circle cx="325" cy="605" r="3.5" fill="rgba(255,255,255,0.1)"/>
+            <circle cx="450" cy="625" r="2.5" fill="rgba(255,255,255,0.08)"/>
+          </svg>
+
           <div class="login-brand__inner">
             <div class="login-brand__logo">
               <img src="/static/logo.svg" alt="IIT Hyderabad" class="login-brand__logo-img" />
@@ -34,102 +64,75 @@
               </div>
             </div>
 
-            <div class="login-brand__eyebrow">Digital Credential Platform</div>
-            <p class="login-brand__tagline">Secure Academic Credentials,<br><em>Decentralized.</em></p>
-            <p class="login-brand__intro">
-              A premium institutional workspace for issuing, claiming, and verifying tamper-proof academic credentials across admin, student, and verifier journeys.
-            </p>
-
-            <div class="login-brand__metrics">
-              <div class="login-brand__metric">
-                <span class="login-brand__metric-value">3</span>
-                <span class="login-brand__metric-label">Role Workspaces</span>
-              </div>
-              <div class="login-brand__metric">
-                <span class="login-brand__metric-value">W3C</span>
-                <span class="login-brand__metric-label">Standards Aligned</span>
-              </div>
-              <div class="login-brand__metric">
-                <span class="login-brand__metric-value">OID4VC</span>
-                <span class="login-brand__metric-label">Wallet Ready</span>
-              </div>
+            <div class="login-brand__headline">
+              <h1 class="login-brand__heading">Secure Academic<br>Credentials,</h1>
+              <span class="login-brand__accent-word">Decentralized.</span>
             </div>
 
-            <div class="login-brand__features">
-              <div class="login-brand__feature">
-                <span class="login-brand__feature-icon">
-                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 2l-2 2m-7.61 7.61a5.5 5.5 0 1 1-7.778 7.778 5.5 5.5 0 0 1 7.777-7.777zm0 0L15.5 7.5m0 0l3 3L22 7l-3-3m-3.5 3.5L19 4"/></svg>
-                </span>
-                <div>
-                  <div class="login-brand__feature-title">Decentralized Identity</div>
-                  <div class="login-brand__feature-sub">W3C DID — you own your identity</div>
-                </div>
-              </div>
-              <div class="login-brand__feature">
-                <span class="login-brand__feature-icon">
-                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
-                </span>
-                <div>
-                  <div class="login-brand__feature-title">Verifiable Credentials</div>
-                  <div class="login-brand__feature-sub">Tamper-proof, cryptographically signed</div>
-                </div>
-              </div>
-              <div class="login-brand__feature">
-                <span class="login-brand__feature-icon">
-                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
-                </span>
-                <div>
-                  <div class="login-brand__feature-title">Privacy-Preserving</div>
-                  <div class="login-brand__feature-sub">Selective disclosure via OID4VP</div>
-                </div>
-              </div>
+            <ul class="login-brand__features" aria-label="Platform features">
+              <li class="login-brand__feature" style="--d:100ms">
+                <svg class="login-brand__feat-icon" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
+                <span>Issue tamper-proof certificates</span>
+              </li>
+              <li class="login-brand__feature" style="--d:220ms">
+                <svg class="login-brand__feat-icon" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="5" y="2" width="14" height="20" rx="2"/><line x1="12" y1="18" x2="12.01" y2="18"/></svg>
+                <span>Claim via OID4VC wallet</span>
+              </li>
+              <li class="login-brand__feature" style="--d:340ms">
+                <svg class="login-brand__feat-icon" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><polyline points="9 11 12 14 22 4"/><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"/></svg>
+                <span>Verify in under 3 seconds</span>
+              </li>
+            </ul>
+
+            <div class="login-brand__stats">
+              <span class="login-brand__stat">3 Role Workspaces</span>
+              <span class="login-brand__stat">W3C Aligned</span>
+              <span class="login-brand__stat">OID4VC Ready</span>
             </div>
 
-            <div class="login-brand__footer">
-              <span class="login-brand__footer-badge">W3C DID Core</span>
-              <span class="login-brand__footer-badge">OID4VCI</span>
-              <span class="login-brand__footer-badge">OID4VP</span>
+            <div class="login-brand__trust">
+              <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
+              W3C VC 2.0 &nbsp;·&nbsp; DID:Web &nbsp;·&nbsp; ISO 27001
             </div>
           </div>
-          <!-- Decorative mesh pattern -->
-          <div class="login-brand__pattern" aria-hidden="true"></div>
         </div>
 
         <!-- ── Form Panel (Right) ── -->
         <div class="login-form-panel">
           <div class="login-form-inner">
 
-            <div class="login-form-header" id="login-form-heading">
-              <div class="login-form-eyebrow">Institutional Access</div>
-              <h2 class="login-form-title">Welcome back</h2>
-              <p class="login-form-sub">Sign in to your institutional account</p>
+            <div class="login-card-top">
+              <div class="login-card-eyebrow">Institutional Access</div>
+              <h2 class="login-card-title" id="login-card-title">Welcome back</h2>
             </div>
 
-            <!-- Auth tab switcher -->
-            <div class="auth-tabs">
-              <button class="auth-tab active" id="tab-login" onclick="switchAuthTab('login')">Sign In</button>
-              <button class="auth-tab" id="tab-register" onclick="switchAuthTab('register')">Register</button>
+            <!-- Pill toggle -->
+            <div class="auth-toggle">
+              <div class="auth-toggle__track" role="tablist">
+                <div class="auth-toggle__pill" id="auth-toggle-pill"></div>
+                <button class="auth-toggle__btn active" id="tab-login" role="tab" aria-selected="true" onclick="switchAuthTab('login')">Sign In</button>
+                <button class="auth-toggle__btn" id="tab-register" role="tab" aria-selected="false" onclick="switchAuthTab('register')">Register</button>
+              </div>
             </div>
 
             <!-- ── Sign In Form ── -->
             <div id="auth-login">
-              <div class="form-group">
-                <label class="form-label">Roll Number / Username</label>
-                <input type="text" id="login-username" class="form-input" placeholder="e.g. 2021CS001"
-                  autocomplete="username" />
+              <div class="form-float-group">
+                <input type="text" id="login-username" class="form-float-input" placeholder=" " autocomplete="username" />
+                <label class="form-float-label" for="login-username">Roll Number / Username</label>
               </div>
-              <div class="form-group">
-                <label class="form-label">Password</label>
-                <div class="input-group">
-                  <input type="password" id="login-password" class="form-input" placeholder="••••••••"
-                    autocomplete="current-password" />
-                  <button type="button" class="input-group__toggle" onclick="togglePassword('login-password', this)" tabindex="-1" aria-label="Toggle password">
-                    <svg class="eye-icon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
-                    <svg class="eye-off-icon" style="display:none" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19m-6.72-1.07a3 3 0 1 1-4.24-4.24"/><line x1="1" y1="1" x2="23" y2="23"/></svg>
-                  </button>
-                </div>
+              <div class="form-float-group has-toggle">
+                <input type="password" id="login-password" class="form-float-input" placeholder=" " autocomplete="current-password" />
+                <label class="form-float-label" for="login-password">Password</label>
+                <button type="button" class="pw-toggle" onclick="togglePassword('login-password', this)" tabindex="-1" aria-label="Toggle password">
+                  <svg class="eye-icon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
+                  <svg class="eye-off-icon" style="display:none" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19m-6.72-1.07a3 3 0 1 1-4.24-4.24"/><line x1="1" y1="1" x2="23" y2="23"/></svg>
+                </button>
               </div>
-              <button class="btn btn-primary btn-block login-submit-btn" id="btn-login">
+              <div class="login-action-row">
+                <button type="button" class="btn-ghost-sm">Forgot password?</button>
+              </div>
+              <button class="login-submit-btn" id="btn-login">
                 <span class="btn-label">Sign In</span>
                 <span class="btn-spinner" style="display:none">
                   <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" class="spin-icon"><path d="M21 12a9 9 0 1 1-6.219-8.56"/></svg>
@@ -139,52 +142,52 @@
 
             <!-- ── Register Form ── -->
             <div id="auth-register" style="display:none;">
+              <div class="role-selector">
+                <button type="button" class="role-card active" data-role="student" onclick="selectRole('student')">
+                  <span class="role-card__icon">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M22 10v6M2 10l10-5 10 5-10 5z"/><path d="M6 12v5c3 3 9 3 12 0v-5"/></svg>
+                  </span>
+                  <span class="role-card__label">Student</span>
+                  <span class="role-card__sub">Claim credentials</span>
+                </button>
+                <button type="button" class="role-card" data-role="admin" onclick="selectRole('admin')">
+                  <span class="role-card__icon">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="12" cy="12" r="3"/><path d="M19.07 4.93a10 10 0 0 1 0 14.14M4.93 4.93a10 10 0 0 0 0 14.14"/></svg>
+                  </span>
+                  <span class="role-card__label">Admin</span>
+                  <span class="role-card__sub">Issue &amp; manage</span>
+                </button>
+                <button type="button" class="role-card" data-role="verifier" onclick="selectRole('verifier')">
+                  <span class="role-card__icon">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M9 11l3 3L22 4"/><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"/></svg>
+                  </span>
+                  <span class="role-card__label">Verifier</span>
+                  <span class="role-card__sub">Authenticate externally</span>
+                </button>
+              </div>
+              <input type="hidden" id="reg-role" value="student" />
 
-              <!-- Role selector cards -->
-              <div class="form-group">
-                <label class="form-label">Select Role</label>
-                <div class="role-selector">
-                  <button type="button" class="role-card active" data-role="student" onclick="selectRole('student')">
-                    <span class="role-card__icon">
-                      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M22 10v6M2 10l10-5 10 5-10 5z"/><path d="M6 12v5c3 3 9 3 12 0v-5"/></svg>
-                    </span>
-                    <span class="role-card__label">Student</span>
-                  </button>
-                  <button type="button" class="role-card" data-role="admin" onclick="selectRole('admin')">
-                    <span class="role-card__icon">
-                      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="12" cy="12" r="3"/><path d="M19.07 4.93a10 10 0 0 1 0 14.14M4.93 4.93a10 10 0 0 0 0 14.14"/></svg>
-                    </span>
-                    <span class="role-card__label">Admin</span>
-                  </button>
-                  <button type="button" class="role-card" data-role="verifier" onclick="selectRole('verifier')">
-                    <span class="role-card__icon">
-                      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M9 11l3 3L22 4"/><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"/></svg>
-                    </span>
-                    <span class="role-card__label">Verifier</span>
-                  </button>
-                </div>
-                <input type="hidden" id="reg-role" value="student" />
+              <div class="form-float-group">
+                <input type="text" id="reg-roll" class="form-float-input" placeholder=" " />
+                <label class="form-float-label" id="reg-roll-label" for="reg-roll">Roll Number</label>
+              </div>
+              <div class="form-float-group">
+                <input type="text" id="reg-name" class="form-float-input" placeholder=" " />
+                <label class="form-float-label" for="reg-name">Full Name</label>
+              </div>
+              <div class="form-float-group has-toggle">
+                <input type="password" id="reg-password" class="form-float-input" placeholder=" " oninput="updatePasswordStrength(this.value)" />
+                <label class="form-float-label" for="reg-password">Password</label>
+                <button type="button" class="pw-toggle" onclick="togglePassword('reg-password', this)" tabindex="-1" aria-label="Toggle password">
+                  <svg class="eye-icon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
+                  <svg class="eye-off-icon" style="display:none" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19m-6.72-1.07a3 3 0 1 1-4.24-4.24"/><line x1="1" y1="1" x2="23" y2="23"/></svg>
+                </button>
+              </div>
+              <div class="pw-strength">
+                <div class="pw-strength__bar" id="pw-strength-bar"></div>
               </div>
 
-              <div class="form-group">
-                <label class="form-label" id="reg-roll-label">Roll Number</label>
-                <input type="text" id="reg-roll" class="form-input" placeholder="e.g. 2022CS101" />
-              </div>
-              <div class="form-group">
-                <label class="form-label">Full Name</label>
-                <input type="text" id="reg-name" class="form-input" placeholder="e.g. Sankalp Kumar" />
-              </div>
-              <div class="form-group">
-                <label class="form-label">Password</label>
-                <div class="input-group">
-                  <input type="password" id="reg-password" class="form-input" placeholder="Min 6 characters" />
-                  <button type="button" class="input-group__toggle" onclick="togglePassword('reg-password', this)" tabindex="-1" aria-label="Toggle password">
-                    <svg class="eye-icon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
-                    <svg class="eye-off-icon" style="display:none" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19m-6.72-1.07a3 3 0 1 1-4.24-4.24"/><line x1="1" y1="1" x2="23" y2="23"/></svg>
-                  </button>
-                </div>
-              </div>
-              <button class="btn btn-primary btn-block login-submit-btn" id="btn-register">
+              <button class="login-submit-btn" id="btn-register" style="margin-top:0.75rem;">
                 <span class="btn-label">Create Account</span>
                 <span class="btn-spinner" style="display:none">
                   <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" class="spin-icon"><path d="M21 12a9 9 0 1 1-6.219-8.56"/></svg>

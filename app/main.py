@@ -88,9 +88,10 @@ app.include_router(verify_router.router)
 
 # ── OID4VCI Well-Known Discovery Endpoints ────────────────────────────────
 
-@app.get("/.well-known/openid-credential-issuer", tags=["OID4VCI"])
 _BINDING_METHODS = ["did:web"]
 
+
+@app.get("/.well-known/openid-credential-issuer", tags=["OID4VCI"])
 def get_oid4vci_metadata():
     """Wallet discovery metadata for OpenID for Verifiable Credential Issuance (Draft 13+)."""
     from app.config import PUBLIC_BASE_URL
