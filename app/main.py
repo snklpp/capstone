@@ -89,6 +89,8 @@ app.include_router(verify_router.router)
 # ── OID4VCI Well-Known Discovery Endpoints ────────────────────────────────
 
 @app.get("/.well-known/openid-credential-issuer", tags=["OID4VCI"])
+_BINDING_METHODS = ["did:web"]
+
 def get_oid4vci_metadata():
     """Wallet discovery metadata for OpenID for Verifiable Credential Issuance (Draft 13+)."""
     from app.config import PUBLIC_BASE_URL
@@ -116,7 +118,7 @@ def get_oid4vci_metadata():
             "UniversityDegreeCredential": {
                 "format": "jwt_vc_json",
                 "scope": "UniversityDegreeCredential",
-                "cryptographic_binding_methods_supported": ["did:web"],
+                "cryptographic_binding_methods_supported": _BINDING_METHODS,
                 "credential_signing_alg_values_supported": ["ES256"],
                 "proof_types_supported": {"jwt": {"proof_signing_alg_values_supported": ["ES256"]}},
                 "credential_definition": {
@@ -152,7 +154,7 @@ def get_oid4vci_metadata():
             "InternshipCredential": {
                 "format": "jwt_vc_json",
                 "scope": "InternshipCredential",
-                "cryptographic_binding_methods_supported": ["did:web"],
+                "cryptographic_binding_methods_supported": _BINDING_METHODS,
                 "credential_signing_alg_values_supported": ["ES256"],
                 "proof_types_supported": {"jwt": {"proof_signing_alg_values_supported": ["ES256"]}},
                 "credential_definition": {
@@ -181,7 +183,7 @@ def get_oid4vci_metadata():
             "SkillBadgeCredential": {
                 "format": "jwt_vc_json",
                 "scope": "SkillBadgeCredential",
-                "cryptographic_binding_methods_supported": ["did:web"],
+                "cryptographic_binding_methods_supported": _BINDING_METHODS,
                 "credential_signing_alg_values_supported": ["ES256"],
                 "proof_types_supported": {"jwt": {"proof_signing_alg_values_supported": ["ES256"]}},
                 "credential_definition": {

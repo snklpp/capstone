@@ -19,21 +19,26 @@ router = APIRouter(prefix="/admin", tags=["Admin"])
 # Key is persisted to disk so it survives uvicorn --reload and server restarts.
 # Without this, every reload rotates the key and all issued VCs become unverifiable.
 
-import os, json as _json
+import os, json as _json, base64, logging
+
+log = logging.getLogger("oid4vci")
 
 _KEY_FILE = os.path.join(os.path.dirname(__file__), "..", "..", "issuer_key.pem")
 _JWK_FILE = os.path.join(os.path.dirname(__file__), "..", "..", "issuer_key.jwk")
 
 def _load_or_create_issuer_key():
-    # Prefer env vars (production / Render deployment)
     pem_b64 = os.environ.get("ISSUER_PRIVATE_KEY_B64")
     jwk_env = os.environ.get("ISSUER_PUBLIC_JWK")
     if pem_b64 and jwk_env:
-        import base64 as _b64
-        private_pem = _b64.b64decode(pem_b64).decode()
+        private_pem = base64.b64decode(pem_b64).decode()
         public_jwk = _json.loads(jwk_env)
-        print("[ISSUER] Loaded issuer key from environment variables")
+        log.info("[ISSUER] Loaded issuer key from environment variables")
         return public_jwk, private_pem
+    if bool(pem_b64) != bool(jwk_env):
+        # One env var set without the other — misconfiguration, not a silent fallthrough
+        missing = "ISSUER_PUBLIC_JWK" if pem_b64 else "ISSUER_PRIVATE_KEY_B64"
+        log.warning("[ISSUER] %s is set but %s is missing — falling back to disk key",
+                    "ISSUER_PRIVATE_KEY_B64" if pem_b64 else "ISSUER_PUBLIC_JWK", missing)
 
     key_file = os.path.abspath(_KEY_FILE)
     jwk_file = os.path.abspath(_JWK_FILE)
@@ -42,15 +47,14 @@ def _load_or_create_issuer_key():
             private_pem = f.read()
         with open(jwk_file, "r") as f:
             public_jwk = _json.load(f)
-        print(f"[ISSUER] Loaded persistent issuer key from {key_file}")
+        log.info("[ISSUER] Loaded persistent issuer key from %s", key_file)
         return public_jwk, private_pem
-    # Generate and persist
     public_jwk, private_pem = generate_ec_key_pair()
     with open(key_file, "w") as f:
         f.write(private_pem)
     with open(jwk_file, "w") as f:
         _json.dump(public_jwk, f)
-    print(f"[ISSUER] Generated and persisted new issuer key to {key_file}")
+    log.info("[ISSUER] Generated and persisted new issuer key to %s", key_file)
     return public_jwk, private_pem
 
 _issuer_public_jwk, _issuer_private_pem = _load_or_create_issuer_key()
@@ -150,8 +154,7 @@ def admin_issue_vc_prepare(
 from typing import Any
 from fastapi import Request
 import traceback
-import logging
-log = logging.getLogger("oid4vci")
+
 
 @router.post("/issue")
 async def wallet_issue_credential(
