@@ -919,7 +919,7 @@
         </div>
 
         <div class="vw-drawer__section">
-          <div class="vw-drawer__section-label">FOCUS VIEW</div>
+          <div class="vw-drawer__section-label">NAVIGATE</div>
           <button class="vw-drawer__row" type="button" onclick="setVerifierScreen('verify'); closeVerifierMenu();">
             <svg class="vw-drawer__row-icon" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><path d="M21 21l-4.35-4.35"/></svg>
             <span>Proof Request</span>
@@ -928,27 +928,6 @@
             <svg class="vw-drawer__row-icon" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"/><polyline points="3 3 3 8 8 8"/><line x1="12" y1="7" x2="12" y2="13"/><line x1="12" y1="13" x2="15" y2="15"/></svg>
             <span>Verification History</span>
           </button>
-          <button class="vw-drawer__row" type="button" onclick="setVerifierScreen('overview'); closeVerifierMenu();">
-            <svg class="vw-drawer__row-icon" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/></svg>
-            <span>Show All Sections</span>
-          </button>
-        </div>
-
-        <div class="vw-drawer__section">
-          <div class="vw-drawer__section-label">TOOLS</div>
-          <div class="vw-drawer__row vw-drawer__row--toggle">
-            <svg class="vw-drawer__row-icon" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="16 18 22 12 16 6"/><polyline points="8 6 2 12 8 18"/></svg>
-            <span>Manual JWT Tool</span>
-            <button id="vw-toggle-manual" class="vw-toggle is-off" type="button" role="switch" aria-checked="false" onclick="toggleVerifierSection('legacy')">
-              <span class="vw-toggle__thumb"></span>
-            </button>
-          </div>
-        </div>
-
-        <div class="vw-drawer__section">
-          <div class="vw-drawer__section-label">ACTIONS</div>
-          <button class="vw-drawer__action-btn" type="button" onclick="loadVerifierStudents(); closeVerifierMenu();">Refresh Student Targets</button>
-          <button class="vw-drawer__action-btn" type="button" onclick="loadVerifierHistory(); closeVerifierMenu();" style="margin-top:0.5rem;">Refresh History</button>
         </div>
       </aside>
 
