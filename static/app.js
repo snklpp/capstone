@@ -33,6 +33,8 @@ const verifierState = {
   screen: 'verify',
   menuOpen: false,
   showLegacy: false,
+  targetMode: 'open',
+  countdownInterval: null,
 };
 
 /* ── Helpers ───────────────────────────────────────────────────────────── */
@@ -207,10 +209,76 @@ function routeToView(username) {
     setAdminScreen('composer');
     refreshAdminDashboard();
   } else if (role === 'verifier') {
+    updateVerifierIdentity(username);
     showView('view-verifier');
     setVerifierScreen('verify');
     loadVerifierStudents();
+    loadVwRecentSessions();
   }
+}
+
+function updateVerifierIdentity(usernameFallback = '') {
+  const payload = token ? parseJwt(token) : {};
+  const name = payload.full_name || localStorage.getItem('verifierFullName') || payload.username || usernameFallback || 'Verifier';
+  const el = document.getElementById('vw-verifier-name');
+  if (el) el.textContent = name;
+}
+
+function setVerifierTargetMode(mode) {
+  verifierState.targetMode = mode;
+  const studentRow = document.getElementById('vw-targeted-row');
+  if (studentRow) studentRow.style.display = mode === 'targeted' ? '' : 'none';
+  document.querySelectorAll('.vw-mode-btn').forEach(btn => {
+    btn.classList.toggle('active', btn.id === `vw-mode-${mode}`);
+  });
+}
+
+function startVerifierCountdown(seconds) {
+  if (verifierState.countdownInterval) clearInterval(verifierState.countdownInterval);
+  let remaining = seconds;
+  const el = document.getElementById('vw-countdown');
+  const update = () => {
+    if (!el) return;
+    if (remaining <= 0) {
+      el.textContent = 'Expired';
+      clearInterval(verifierState.countdownInterval);
+      verifierState.countdownInterval = null;
+      return;
+    }
+    const m = Math.floor(remaining / 60);
+    const s = remaining % 60;
+    el.textContent = `${m}:${s.toString().padStart(2, '0')}`;
+    remaining--;
+  };
+  update();
+  verifierState.countdownInterval = setInterval(update, 1000);
+}
+
+async function loadVwRecentSessions() {
+  try {
+    const sessions = await api('GET', '/verifier/sessions');
+    const host = document.getElementById('vw-recent-sessions-list');
+    if (!host) return;
+    const recent = sessions.slice(0, 6);
+    if (!recent.length) {
+      host.innerHTML = '<div class="vw-recent-empty">No sessions yet</div>';
+      return;
+    }
+    host.innerHTML = recent.map(s => {
+      const statusKey = (s.status || '').toLowerCase();
+      return `
+        <div class="vw-recent-row">
+          <div class="vw-recent-row__info">
+            <div class="vw-recent-row__name">${s.student_name || '—'}</div>
+            <div class="vw-recent-row__type">${(s.vc_type || s.summary || '').replace('Credential', '').trim()}</div>
+          </div>
+          <div class="vw-recent-row__meta">
+            <div class="vw-recent-row__time">${s.created_at ? new Date(s.created_at).toLocaleDateString() : '—'}</div>
+            <span class="vw-recent-row__badge vw-recent-row__badge--${statusKey}">${s.status || '?'}</span>
+          </div>
+        </div>`;
+    }).join('');
+  } catch (_) {}
 }
 
 function updateAdminIdentity(usernameFallback = '') {
@@ -927,8 +995,8 @@ function renderCertificate(c, payload, id, showDownloadVCButton) {
             <div class="diploma-name">${c.student_name}</div>
             <div class="diploma-rollno">Roll No. ${c.student_id}</div>
             <div class="diploma-body">has successfully completed all requirements and is hereby conferred the degree of</div>
-            <div class="diploma-degree">${c.degree_name}</div>
-            <div class="diploma-body">in the year <strong>${c.year}</strong></div>
+            <div class="diploma-degree">${c.degree || c.degree_name || '—'}</div>
+            <div class="diploma-body">in the year <strong>${c.graduation_year || c.year || '—'}</strong></div>
             <div class="diploma-date">Issued on ${dateStr}</div>
             <div class="diploma-did-badge"><span class="dot"></span> Cryptographically Verified · ${c.student_did}</div>
 
@@ -1758,6 +1826,11 @@ function resetVerifierState() {
   verifierState.screen = 'verify';
   verifierState.menuOpen = false;
   verifierState.showLegacy = false;
+  verifierState.targetMode = 'open';
+  if (verifierState.countdownInterval) {
+    clearInterval(verifierState.countdownInterval);
+    verifierState.countdownInterval = null;
+  }
   setVerifierMenuOpen(false);
 }
 
@@ -1770,7 +1843,7 @@ function setVerifierMenuOpen(open) {
     drawer.classList.toggle('open', verifierState.menuOpen);
     drawer.setAttribute('aria-hidden', verifierState.menuOpen ? 'false' : 'true');
   }
-  document.body.classList.toggle('verifier-no-scroll', verifierState.menuOpen);
+  // vw-drawer-overlay uses display:none toggle via .open, no body scroll lock needed
 }
 
 function toggleVerifierMenu() {
@@ -1784,30 +1857,33 @@ function closeVerifierMenu() {
 function applyVerifierVisibility() {
   const setHidden = (id, hidden) => {
     const el = document.getElementById(id);
-    if (!el) return;
-    el.classList.toggle('verifier-hidden', !!hidden);
-    el.classList.toggle('active', !hidden);
+    if (el) el.classList.toggle('verifier-hidden', !!hidden);
   };
 
   const map = {
     overview: { verify: true, history: true },
-    verify: { verify: true, history: false },
-    history: { verify: false, history: true },
+    verify:   { verify: true, history: false },
+    history:  { verify: false, history: true },
   };
   const view = map[verifierState.screen] || map.verify;
 
   setHidden('verifier-tab-verify', !view.verify);
   setHidden('verifier-tab-history', !view.history);
-  setHidden('verifier-legacy-panel', !(view.verify && verifierState.showLegacy));
 
-  const menuBtn = document.querySelector('.verifier-hamburger-btn');
-  if (menuBtn) {
-    const labels = {
-      verify: 'Menu · Proof Request',
-      history: 'Menu · History',
-      overview: 'Menu · Overview',
-    };
-    menuBtn.textContent = `☰ ${labels[verifierState.screen] || 'Menu'}`;
+  // Manual panel uses display style, not class
+  const legacyPanel = document.getElementById('verifier-legacy-panel');
+  if (legacyPanel) legacyPanel.style.display = (view.verify && verifierState.showLegacy) ? '' : 'none';
+
+  // Breadcrumb
+  const labels = { verify: 'Proof Request', history: 'History', overview: 'All Sections' };
+  const breadcrumb = document.getElementById('vw-breadcrumb-screen');
+  if (breadcrumb) breadcrumb.textContent = labels[verifierState.screen] || 'Proof Request';
+
+  // Manual tool toggle sync
+  const manualToggle = document.getElementById('vw-toggle-manual');
+  if (manualToggle) {
+    manualToggle.classList.toggle('is-off', !verifierState.showLegacy);
+    manualToggle.setAttribute('aria-checked', verifierState.showLegacy ? 'true' : 'false');
   }
 }
 
@@ -1861,40 +1937,49 @@ async function initiateOID4VP() {
   try {
     setVerifierScreen('verify');
 
-    // Get optional target student
     const select = document.getElementById('verifier-student-select');
-    const targetDid = select ? select.value : '';
+    const targetDid = (verifierState.targetMode === 'targeted' && select) ? select.value : '';
     const body = targetDid ? { target_student_did: targetDid } : {};
 
     const data = await api('POST', '/verify/init', body);
-    
-    const qrContainer = document.getElementById('verifier-qr-container');
-    const resultCard = document.getElementById('verifier-result-card');
-    const scanStatus = document.getElementById('verifier-scan-status');
-    const qrDiv = document.getElementById('verifier-qrcode');
 
+    // Show QR block
+    const qrContainer = document.getElementById('verifier-qr-container');
+    const qrDiv = document.getElementById('verifier-qrcode');
+    const scanStatus = document.getElementById('verifier-scan-status');
     if (qrContainer) qrContainer.style.display = 'flex';
-    if (resultCard) resultCard.style.display = 'none';
     if (scanStatus) scanStatus.innerHTML = '<span class="spinner"></span> Waiting for student scan...';
 
     if (!qrDiv) throw new Error('QR container not available');
-    qrDiv.innerHTML = ''; // clear previous
-    
+    qrDiv.innerHTML = '';
     new QRCode(qrDiv, {
       text: data.qr_content,
-      width: 256,
-      height: 256,
-      colorDark : "#000000",
-      colorLight : "#ffffff",
-      correctLevel : QRCode.CorrectLevel.L
+      width: 220,
+      height: 220,
+      colorDark: '#000000',
+      colorLight: '#ffffff',
+      correctLevel: QRCode.CorrectLevel.L,
     });
 
-    // 2. Start Polling for status
+    // Update session chip and start countdown
+    const sessionIdEl = document.getElementById('vw-session-id');
+    if (sessionIdEl) sessionIdEl.textContent = (data.verification_id || '').slice(0, 8).toUpperCase();
+    startVerifierCountdown(300);
+
+    // Right panel: reset to awaiting state
+    const awaitingEl = document.getElementById('vw-awaiting-state');
+    const resultCard = document.getElementById('verifier-result-card');
+    if (awaitingEl) awaitingEl.style.display = '';
+    if (resultCard) { resultCard.style.display = 'none'; resultCard.innerHTML = ''; }
+
+    // Pulsing dot → active
+    const dot = document.getElementById('vw-session-dot');
+    if (dot) { dot.className = 'vw-session-dot active'; }
+
+    // Start polling
     if (verifierPollingInterval) clearInterval(verifierPollingInterval);
     verifierPollingInterval = setInterval(() => pollVerificationStatus(data.verification_id), 3000);
 
-    qrContainer?.scrollIntoView({ behavior: 'smooth', block: 'start' });
-    
     toast('Verification QR generated!', 'success');
   } catch (e) {
     toast(e.message, 'error');
@@ -1920,12 +2005,24 @@ async function pollVerificationStatus(verificationId) {
     if (data.status === 'verified') {
       clearInterval(verifierPollingInterval);
       verifierPollingInterval = null;
+      if (verifierState.countdownInterval) {
+        clearInterval(verifierState.countdownInterval);
+        verifierState.countdownInterval = null;
+      }
 
       setVerifierScreen('verify');
-      
-      // Hide QR and show result
-      const qrContainer = document.getElementById('verifier-qr-container');
-      if (qrContainer) qrContainer.style.display = 'none';
+
+      // Update scan status in left panel (keep QR visible)
+      const scanStatus = document.getElementById('verifier-scan-status');
+      if (scanStatus) scanStatus.innerHTML = '✓ Wallet scan received';
+
+      // Dot → verified
+      const dot = document.getElementById('vw-session-dot');
+      if (dot) dot.className = 'vw-session-dot verified';
+
+      // Right panel: hide awaiting, show result
+      const awaitingEl = document.getElementById('vw-awaiting-state');
+      if (awaitingEl) awaitingEl.style.display = 'none';
       const resultCard = document.getElementById('verifier-result-card');
       if (!resultCard) return;
       resultCard.style.display = 'block';
@@ -2003,13 +2100,23 @@ async function pollVerificationStatus(verificationId) {
         </div>
       `;
       toast('Verification Completed!', 'success');
-      resultCard.scrollIntoView({ behavior: 'smooth', block: 'start' });
-      loadVerifierHistory(); // Refresh the list
+      resultCard.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+      loadVerifierHistory();
+      loadVwRecentSessions();
+      updateVerifierHeroStats();
     } else if (data.status === 'expired') {
       clearInterval(verifierPollingInterval);
       verifierPollingInterval = null;
+      if (verifierState.countdownInterval) {
+        clearInterval(verifierState.countdownInterval);
+        verifierState.countdownInterval = null;
+      }
       const scanStatus = document.getElementById('verifier-scan-status');
       if (scanStatus) scanStatus.innerHTML = '<span style="color:var(--error);">QR expired. Generate a new request.</span>';
+      const countdown = document.getElementById('vw-countdown');
+      if (countdown) countdown.textContent = 'Expired';
+      const dot = document.getElementById('vw-session-dot');
+      if (dot) dot.className = 'vw-session-dot';
     }
   } catch (e) {
     console.error("Polling error:", e);
@@ -2033,6 +2140,20 @@ async function verifyManual() {
   } catch (e) {
     toast('Invalid JWT format', 'error');
   }
+}
+
+async function updateVerifierHeroStats() {
+  try {
+    const sessions = await api('GET', '/verifier/sessions');
+    const today = new Date().toDateString();
+    const todaySessions = sessions.filter(s => s.created_at && new Date(s.created_at).toDateString() === today);
+    const verified = todaySessions.filter(s => s.status === 'VERIFIED').length;
+    const rejected = todaySessions.filter(s => s.status === 'EXPIRED' || s.status === 'REJECTED').length;
+    const el = (id, v) => { const e = document.getElementById(id); if (e) e.textContent = v; };
+    el('vw-stat-sessions', todaySessions.length);
+    el('vw-stat-verified', verified);
+    el('vw-stat-rejected', rejected);
+  } catch (_) {}
 }
 
 /* ── Verifier: History ────────────────────────────────────────────────── */

@@ -537,6 +537,7 @@ def get_admin_vc_detail(
         target = next((o for o in offer if o.id.startswith(id_val.replace("offer_",""))), None)
         if not target: raise HTTPException(status_code=404)
         
+        od = target.offer_details
         return {
             "status": "PENDING",
             "certificate": {
@@ -544,14 +545,21 @@ def get_admin_vc_detail(
                 "student_name": target.user.full_name or target.user.username,
                 "student_id": target.user.student_id or "",
                 "student_did": "Pending claim...",
-                "degree_name": target.offer_details.get("degree", ""),
-                "year": target.offer_details.get("year", ""),
-                "company": target.offer_details.get("company", ""),
-                "role": target.offer_details.get("role", ""),
-                "skill_name": target.offer_details.get("skill_name", ""),
-                "proficiency": target.offer_details.get("proficiency", ""),
+                "degree": od.get("degree", ""),
+                "degree_name": od.get("degree", ""),
+                "graduation_year": od.get("graduation_year") or od.get("year", ""),
+                "year": od.get("graduation_year") or od.get("year", ""),
+                "branch": od.get("branch", ""),
+                "specialization": od.get("specialization", ""),
+                "cgpa": od.get("cgpa", ""),
+                "honours": od.get("honours", ""),
+                "company": od.get("company", ""),
+                "role": od.get("role", ""),
+                "duration": od.get("duration", ""),
+                "skill_name": od.get("skill_name", ""),
+                "proficiency": od.get("proficiency", ""),
                 "vc_type": target.vc_type,
-                "issuance_date": target.created_at.isoformat() + "Z"
+                "issuance_date": target.created_at.isoformat() + "Z",
             }
         }
 
@@ -571,16 +579,29 @@ def get_admin_vc_detail(
 
     return {
         "status": "ISSUED",
-        "verifiable_credential": vc.vc_jwt, # For type detection
+        "verifiable_credential": vc.vc_jwt,
         "certificate": {
             "vc_id": vc.vc_id,
             "student_name": student_name,
             "student_id": vc.did.user.student_id if (vc.did and vc.did.user) else "",
             "student_did": vc.did.did_uri if vc.did else "",
-            "degree_name": cs.get("degree", {}).get("name", ""),
-            "year": cs.get("degree", {}).get("year", ""),
+            # degree / graduation_year are flat strings in the credentialSubject
+            "degree": cs.get("degree", ""),
+            "degree_name": cs.get("degree", ""),
+            "graduation_year": cs.get("graduation_year", ""),
+            "year": cs.get("graduation_year", ""),
+            "branch": cs.get("branch", ""),
+            "specialization": cs.get("specialization", ""),
+            "cgpa": cs.get("cgpa", ""),
+            "honours": cs.get("honours", ""),
+            "company": cs.get("company", ""),
+            "role": cs.get("role", ""),
+            "duration": cs.get("duration", ""),
+            "skill_name": cs.get("skill_name", ""),
+            "proficiency": cs.get("proficiency", ""),
+            "issued_on": cs.get("issued_on", ""),
             "vc_type": vc.vc_type,
-            "issuance_date": vc_data.get("issuanceDate", "")
+            "issuance_date": vc_data.get("issuanceDate", ""),
         }
     }
 

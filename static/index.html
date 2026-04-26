@@ -7,7 +7,7 @@
   <title>IIT Hyderabad — Verifiable Credentials</title>
   <meta name="description"
     content="Decentralized Identity and Verifiable Credentials management for university students, admins, and verifiers." />
-  <link rel="stylesheet" href="/static/styles.css?v=9" />
+  <link rel="stylesheet" href="/static/styles.css?v=10" />
   <link rel="icon" href="/static/logo.svg" type="image/svg+xml" />
   <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
@@ -859,143 +859,222 @@
 
     <!-- ═══ VERIFIER VIEW ═══ -->
     <div id="view-verifier" class="view">
-      <nav class="navbar">
-        <a class="navbar-brand" href="#">
-          <img src="/static/logo.svg" alt="" class="logo-img"> IIT Hyderabad
-        </a>
-        <div class="navbar-right">
-          <span class="user-badge"><span class="dot"></span> Verifier</span>
-          <button class="btn btn-outline btn-sm" onclick="logout()">Sign Out</button>
+
+      <!-- Navbar -->
+      <nav class="vw-navbar">
+        <div class="vw-navbar__left">
+          <img src="/static/logo.svg" alt="" class="logo-img" style="width:34px;height:34px;object-fit:contain;">
+          <span class="vw-navbar__brand">IIT Hyderabad</span>
+        </div>
+        <nav class="vw-breadcrumb" aria-label="breadcrumb">
+          <span class="vw-breadcrumb__item">Menu</span>
+          <svg class="vw-breadcrumb__sep" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M9 18l6-6-6-6"/></svg>
+          <span class="vw-breadcrumb__item vw-breadcrumb__item--active" id="vw-breadcrumb-screen">Proof Request</span>
+        </nav>
+        <div class="vw-navbar__right">
+          <div class="vw-avatar-chip">
+            <div class="vw-avatar-chip__orb">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/><polyline points="9 12 11 14 15 10"/></svg>
+            </div>
+            <div class="vw-avatar-chip__text">
+              <span class="vw-avatar-chip__name" id="vw-verifier-name">Verifier</span>
+              <span class="vw-avatar-chip__role">Verifier</span>
+            </div>
+          </div>
+          <button class="vw-icon-btn verifier-hamburger-btn" type="button" onclick="toggleVerifierMenu()" aria-label="Menu">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="18" x2="21" y2="18"/></svg>
+          </button>
+          <button class="vw-signout-btn" onclick="logout()">Sign Out</button>
         </div>
       </nav>
 
-      <div class="verifier-shell">
-        <div class="verifier-toprow">
-          <div>
-            <div class="verifier-breadcrumb">Verifier / Proof Requests</div>
-            <h2 class="verifier-title">Verifier Workspace</h2>
-            <p class="verifier-subtitle">Generate proof requests and review verification outcomes.</p>
+      <!-- Hero Banner -->
+      <section class="vw-hero">
+        <div class="vw-hero__body">
+          <div class="vw-hero__left">
+            <h2 class="vw-hero__heading">Verifier Proof Console</h2>
+            <div class="vw-hero__pills">
+              <span class="vw-hero__pill">⬡ <span id="vw-stat-sessions">0</span> Sessions Today</span>
+              <span class="vw-hero__pill vw-hero__pill--verified">✓ <span id="vw-stat-verified">0</span> Verified</span>
+              <span class="vw-hero__pill vw-hero__pill--rejected">✗ <span id="vw-stat-rejected">0</span> Rejected</span>
+            </div>
           </div>
-          <div class="verifier-top-actions">
-            <button class="btn btn-outline btn-sm verifier-hamburger-btn" type="button" onclick="toggleVerifierMenu()">☰ Menu</button>
+          <div class="vw-hero__right">
+            <button class="vw-hero__action" type="button" onclick="setVerifierScreen('verify')">New Request</button>
+            <button class="vw-hero__action" type="button" onclick="setVerifierScreen('history')">Open History</button>
+            <button class="vw-hero__action" type="button" onclick="toggleVerifierSection('legacy')">Manual JWT Tool</button>
+          </div>
+        </div>
+        <div class="vw-hero__footer">Open or Targeted Proof · Wallet Scan · Session Review</div>
+      </section>
+
+      <!-- Slide-over Drawer -->
+      <div id="verifier-menu-overlay" class="vw-drawer-overlay" onclick="closeVerifierMenu()"></div>
+      <aside id="verifier-menu-drawer" class="vw-drawer" aria-hidden="true">
+        <div class="vw-drawer__header">
+          <div class="vw-drawer__title">Verifier Console</div>
+          <button class="vw-drawer__close" type="button" onclick="closeVerifierMenu()" aria-label="Close">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+          </button>
+        </div>
+
+        <div class="vw-drawer__section">
+          <div class="vw-drawer__section-label">FOCUS VIEW</div>
+          <button class="vw-drawer__row" type="button" onclick="setVerifierScreen('verify'); closeVerifierMenu();">
+            <svg class="vw-drawer__row-icon" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><path d="M21 21l-4.35-4.35"/></svg>
+            <span>Proof Request</span>
+          </button>
+          <button class="vw-drawer__row" type="button" onclick="setVerifierScreen('history'); closeVerifierMenu();">
+            <svg class="vw-drawer__row-icon" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"/><polyline points="3 3 3 8 8 8"/><line x1="12" y1="7" x2="12" y2="13"/><line x1="12" y1="13" x2="15" y2="15"/></svg>
+            <span>Verification History</span>
+          </button>
+          <button class="vw-drawer__row" type="button" onclick="setVerifierScreen('overview'); closeVerifierMenu();">
+            <svg class="vw-drawer__row-icon" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/></svg>
+            <span>Show All Sections</span>
+          </button>
+        </div>
+
+        <div class="vw-drawer__section">
+          <div class="vw-drawer__section-label">TOOLS</div>
+          <div class="vw-drawer__row vw-drawer__row--toggle">
+            <svg class="vw-drawer__row-icon" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="16 18 22 12 16 6"/><polyline points="8 6 2 12 8 18"/></svg>
+            <span>Manual JWT Tool</span>
+            <button id="vw-toggle-manual" class="vw-toggle is-off" type="button" role="switch" aria-checked="false" onclick="toggleVerifierSection('legacy')">
+              <span class="vw-toggle__thumb"></span>
+            </button>
           </div>
         </div>
 
-        <section class="workspace-hero workspace-hero--verifier">
-          <div class="workspace-hero__content">
-            <div class="workspace-hero__eyebrow">Proof Request Flow</div>
-            <h3 class="workspace-hero__title">Create cleaner verification sessions and review outcomes with confidence.</h3>
-            <p class="workspace-hero__text">Generate a wallet QR, watch the session resolve, and inspect credential details in a more deliberate verification experience.</p>
-            <div class="workspace-hero__actions">
-              <button class="btn btn-primary btn-sm" type="button" onclick="setVerifierScreen('verify')">New Request</button>
-              <button class="btn btn-outline btn-sm" type="button" onclick="setVerifierScreen('history')">Open History</button>
-              <button class="btn btn-outline btn-sm" type="button" onclick="toggleVerifierSection('legacy')">Toggle Manual Tool</button>
+        <div class="vw-drawer__section">
+          <div class="vw-drawer__section-label">ACTIONS</div>
+          <button class="vw-drawer__action-btn" type="button" onclick="loadVerifierStudents(); closeVerifierMenu();">Refresh Student Targets</button>
+          <button class="vw-drawer__action-btn" type="button" onclick="loadVerifierHistory(); closeVerifierMenu();" style="margin-top:0.5rem;">Refresh History</button>
+        </div>
+      </aside>
+
+      <!-- Two-column main grid -->
+      <div class="vw-main-grid" id="verifier-tab-verify">
+
+        <!-- Left: QR Request Panel -->
+        <section class="card vw-panel" id="vw-request-card">
+          <div class="vw-panel-header">
+            <div class="vw-panel-header__icon">
+              <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/><path d="M14 14h.01M14 18h.01M18 14h.01M18 18h.01M21 14h.01M14 21h.01"/></svg>
             </div>
-          </div>
-          <div class="workspace-hero__rail">
-            <span class="workspace-hero__pill">Open or targeted proof</span>
-            <span class="workspace-hero__pill">Wallet scan workflow</span>
-            <span class="workspace-hero__pill">Session detail review</span>
-          </div>
-        </section>
-
-        <div id="verifier-menu-overlay" class="verifier-menu-overlay" onclick="closeVerifierMenu()"></div>
-        <aside id="verifier-menu-drawer" class="verifier-menu-drawer" aria-hidden="true">
-          <div class="verifier-menu-header">
-            <div class="verifier-menu-title">Verifier Menu</div>
-            <button class="btn btn-outline btn-sm" type="button" onclick="closeVerifierMenu()">Close</button>
-          </div>
-
-          <div class="verifier-menu-group">
-            <div class="verifier-menu-group-title">Focus View</div>
-            <button class="verifier-menu-link" type="button" onclick="setVerifierScreen('verify'); closeVerifierMenu();">Proof Request</button>
-            <button class="verifier-menu-link" type="button" onclick="setVerifierScreen('history'); closeVerifierMenu();">Verification History</button>
-            <button class="verifier-menu-link" type="button" onclick="setVerifierScreen('overview'); closeVerifierMenu();">Show All Sections</button>
-          </div>
-
-          <div class="verifier-menu-group">
-            <div class="verifier-menu-group-title">Tools</div>
-            <button class="verifier-menu-link" type="button" onclick="toggleVerifierSection('legacy')">Toggle Manual JWT Tool</button>
-          </div>
-
-          <div class="verifier-menu-group">
-            <div class="verifier-menu-group-title">Actions</div>
-            <button class="verifier-menu-link" type="button" onclick="loadVerifierStudents(); closeVerifierMenu();">Refresh Student Targets</button>
-            <button class="verifier-menu-link" type="button" onclick="loadVerifierHistory(); closeVerifierMenu();">Refresh History</button>
-          </div>
-        </aside>
-
-        <section id="verifier-tab-verify" class="card verifier-section active">
-          <div class="card-header">
-            <div class="card-icon blue">📱</div>
             <div>
-              <div class="card-title">Request Proof via Wallet</div>
-              <div class="card-subtitle">Generate a verification QR and wait for the wallet response</div>
+              <div class="vw-panel-header__title">Request Proof via Wallet</div>
+              <div class="vw-panel-header__sub">Generate a verification QR and await wallet response</div>
             </div>
           </div>
 
-          <div class="verifier-request-row">
-            <div class="form-group verifier-form-group">
-              <label class="form-label">Target Student (optional)</label>
-              <select id="verifier-student-select" class="form-select">
+          <div class="vw-form-section">
+            <div class="vw-form-section__label">VERIFICATION MODE</div>
+            <div class="vw-mode-toggle">
+              <button class="vw-mode-btn active" id="vw-mode-open" type="button" onclick="setVerifierTargetMode('open')">Open Verification</button>
+              <button class="vw-mode-btn" id="vw-mode-targeted" type="button" onclick="setVerifierTargetMode('targeted')">Targeted</button>
+            </div>
+            <div id="vw-targeted-row" style="display:none; margin-top:0.75rem;">
+              <label class="form-label" style="font-size:0.7rem;color:#6B7280;font-weight:600;text-transform:uppercase;letter-spacing:0.06em;">Target Student</label>
+              <select id="verifier-student-select" class="form-select" style="margin-top:0.375rem;">
                 <option value="">Any student (open verification)</option>
               </select>
             </div>
-            <button class="btn btn-primary" id="btn-request-vp" onclick="initiateOID4VP()">
-              Generate Verification QR
-            </button>
           </div>
 
-          <p class="verifier-note">Student scans this QR in wallet and submits proof back to your session.</p>
+          <button class="vw-generate-btn" id="btn-request-vp" type="button" onclick="initiateOID4VP()">
+            Generate Verification QR
+          </button>
 
-          <div id="verifier-qr-container" class="verifier-qr-container" style="display:none;">
-            <div class="verifier-qr-title">Wallet Scan Required</div>
-            <div class="verifier-qr-sub">Ask the student to scan this QR and approve the proof request.</div>
-            <div id="verifier-qrcode" class="verifier-qrcode"></div>
-            <p id="verifier-scan-status" class="verifier-scan-status">
+          <!-- QR block (shown after generation) -->
+          <div id="verifier-qr-container" class="vw-qr-block" style="display:none;">
+            <div class="vw-qr-block__head">
+              <span class="vw-session-chip">
+                Session <span id="vw-session-id">—</span>
+              </span>
+              <span class="vw-expiry-label">Expires in <span id="vw-countdown" class="vw-countdown">5:00</span></span>
+            </div>
+            <div id="verifier-qrcode" class="vw-qrcode"></div>
+            <p id="verifier-scan-status" class="vw-scan-status">
               <span class="spinner"></span> Waiting for student scan...
             </p>
+            <button class="vw-regenerate-link" type="button" onclick="initiateOID4VP()">↻ Regenerate</button>
           </div>
-
-          <div id="verifier-result-card" class="verifier-result-card" style="display:none;"></div>
         </section>
 
-        <section id="verifier-legacy-panel" class="card verifier-section verifier-hidden">
-          <div class="card-header">
-            <div class="card-icon rose">🔍</div>
+        <!-- Right: Live Session Panel -->
+        <aside class="card vw-panel" id="vw-session-card">
+          <div class="vw-panel-header">
+            <div class="vw-panel-header__icon">
+              <span id="vw-session-dot" class="vw-session-dot"></span>
+            </div>
             <div>
-              <div class="card-title">Manual JWT Verification</div>
-              <div class="card-subtitle">Legacy fallback when wallet flow is unavailable</div>
+              <div class="vw-panel-header__title">Session Status</div>
+              <div class="vw-panel-header__sub">Live wallet response tracker</div>
             </div>
           </div>
-          <div class="form-group">
-            <label class="form-label">Verifiable Credential (JWT)</label>
-            <textarea id="verify-vc-jwt" class="form-input verifier-manual-textarea" rows="4" placeholder="eyJhbGciOiJFUzI1NiIs..."></textarea>
-          </div>
-          <div class="verifier-manual-actions">
-            <button class="btn btn-outline btn-sm" id="btn-verify-manual" onclick="verifyManual()">Verify Manual JWT</button>
-          </div>
-          <div id="verify-result" class="verifier-manual-result"></div>
-        </section>
 
-        <section id="verifier-tab-history" class="verifier-section verifier-hidden">
-          <div class="section-header">
-            <div>
-              <div class="section-title">Verification History</div>
-              <div class="section-subtitle">All verification sessions you've initiated</div>
+          <!-- Awaiting empty state -->
+          <div id="vw-awaiting-state" class="vw-awaiting">
+            <div class="vw-awaiting__icon">
+              <svg width="30" height="30" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.4"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/><path d="M14 14h.01M14 18h.01M18 14h.01M18 18h.01M21 14h.01M14 21h.01"/></svg>
             </div>
-            <button class="btn btn-outline btn-sm" onclick="loadVerifierHistory()">↻ Refresh</button>
+            <div class="vw-awaiting__label">Awaiting wallet scan...</div>
           </div>
-          <div class="card" style="padding:0.5rem;">
-            <div id="verifier-history-list"></div>
+
+          <!-- Result card (shown after verification) -->
+          <div id="verifier-result-card" class="vw-result-host" style="display:none;"></div>
+
+          <!-- Recent sessions list -->
+          <div class="vw-recent">
+            <div class="vw-recent__header">Recent Sessions</div>
+            <div id="vw-recent-sessions-list" class="vw-recent__list">
+              <div class="vw-recent-empty">No sessions yet</div>
+            </div>
           </div>
-        </section>
-      </div>
-    </div>
+        </aside>
+
+      </div><!-- /.vw-main-grid -->
+
+      <!-- Manual JWT Tool (hidden, toggled via drawer) -->
+      <section id="verifier-legacy-panel" class="card vw-manual-panel" style="display:none;">
+        <div class="vw-panel-header">
+          <div class="vw-panel-header__icon">
+            <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="16 18 22 12 16 6"/><polyline points="8 6 2 12 8 18"/></svg>
+          </div>
+          <div>
+            <div class="vw-panel-header__title">Manual JWT Verification</div>
+            <div class="vw-panel-header__sub">Legacy fallback when wallet flow is unavailable</div>
+          </div>
+        </div>
+        <div class="form-group">
+          <label class="form-label">Verifiable Credential (JWT)</label>
+          <textarea id="verify-vc-jwt" class="form-input verifier-manual-textarea" rows="4" placeholder="eyJhbGciOiJFUzI1NiIs..."></textarea>
+        </div>
+        <div class="verifier-manual-actions">
+          <button class="btn btn-outline btn-sm" id="btn-verify-manual" type="button" onclick="verifyManual()">Verify Manual JWT</button>
+        </div>
+        <div id="verify-result" class="verifier-manual-result"></div>
+      </section>
+
+      <!-- History section -->
+      <section id="verifier-tab-history" class="vw-history-section verifier-hidden">
+        <div class="vw-history-header">
+          <div>
+            <div class="vw-history-title">Verification History</div>
+            <div class="vw-history-sub">All verification sessions you've initiated</div>
+          </div>
+          <button class="vw-history-refresh-btn" type="button" onclick="loadVerifierHistory()">↻ Refresh</button>
+        </div>
+        <div class="card" style="padding:0.5rem;">
+          <div id="verifier-history-list"></div>
+        </div>
+      </section>
+
+    </div><!-- /#view-verifier -->
 
   </div>
 
-  <script src="/static/app.js?v=7"></script>
+  <script src="/static/app.js?v=8"></script>
 </body>
 
 </html>
