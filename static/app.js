@@ -950,6 +950,9 @@ function renderCertificate(c, payload, id, showDownloadVCButton) {
     if (vcType === 'InternshipCredential') {
       const cs = payload.vc.credentialSubject || {};
       const intn = cs.internship || {};
+      const company = intn.company || cs.company || 'Private Organization';
+      const duration = intn.duration || cs.duration || 'N/A';
+      const role = intn.role || cs.role || '';
       template = `
         <div class="diploma internship-cert">
           <div class="diploma-inner">
@@ -957,8 +960,9 @@ function renderCertificate(c, payload, id, showDownloadVCButton) {
             <div class="diploma-certifies">Awarded To</div>
             <div class="diploma-name">${c.student_name}</div>
             <div class="diploma-body">for successfully completing an internship at</div>
-            <div class="diploma-degree" style="font-family:'Space Grotesk', sans-serif; color:var(--accent);">${intn.company || 'Private Organization'}</div>
-            <div class="diploma-body">Duration: <strong>${intn.duration || 'N/A'}</strong></div>
+            <div class="diploma-degree" style="font-family:'Space Grotesk', sans-serif; color:var(--accent);">${company}</div>
+            ${role ? `<div class="diploma-body">Role: <strong>${role}</strong></div>` : ''}
+            <div class="diploma-body">Duration: <strong>${duration}</strong></div>
             <div class="diploma-date">Issued on ${dateStr}</div>
             <div class="diploma-did-badge"><span class="dot"></span> Verified · ${c.student_did}</div>
           </div>
@@ -967,6 +971,8 @@ function renderCertificate(c, payload, id, showDownloadVCButton) {
     } else if (vcType === 'SkillBadgeCredential') {
       const cs = payload.vc.credentialSubject || {};
       const badge = cs.badge || cs.skill || {};
+      const skillName = badge.name || cs.skill_name || 'Professional Skill';
+      const level = badge.level || badge.proficiency || cs.proficiency || 'Advanced';
       template = `
         <div class="diploma skill-badge-cert">
           <div class="diploma-inner">
@@ -974,8 +980,8 @@ function renderCertificate(c, payload, id, showDownloadVCButton) {
              <div class="diploma-university">Skill Badge</div>
              <div class="diploma-certifies">This acknowledges that</div>
              <div class="diploma-name">${c.student_name}</div>
-             <div class="diploma-body">has achieved the proficiency level of <strong>${badge.level || badge.proficiency || 'Advanced'}</strong> in</div>
-             <div class="diploma-degree" style="color:#4a148c">${badge.name || 'Professional Skill'}</div>
+             <div class="diploma-body">has achieved the proficiency level of <strong>${level}</strong> in</div>
+             <div class="diploma-degree" style="color:#4a148c">${skillName}</div>
              <div class="diploma-date">Issued on ${dateStr}</div>
              <div class="diploma-did-badge">${c.student_did}</div>
           </div>
@@ -986,7 +992,7 @@ function renderCertificate(c, payload, id, showDownloadVCButton) {
       template = `
         <div class="diploma">
           <div class="diploma-bg"> ${CORNER_SVG} </div>
-          <div class="diploma-inner" style="border: 2px solid #b8963e; padding: 2rem;">
+          <div class="diploma-inner" style="border: 2px solid #b8963e; padding: 2rem 2rem 6rem;">
             <div class="diploma-crest"><img src="/static/logo.svg" alt="" style="width:100%;height:100%"></div>
             <div class="diploma-university">IIT Hyderabad</div>
             <div class="diploma-sub">Verifiable Credentials</div>
@@ -1050,6 +1056,40 @@ function closeCertificate() {
     setTimeout(() => overlay.remove(), 200);
   }
   document.removeEventListener('keydown', certEscHandler);
+}
+
+function openCertPreviewFromVerification(cert, verificationId) {
+  const s = cert.subject_data || {};
+  const c = {
+    student_name: s.student_name || s.name || '—',
+    student_id: s.student_id || '—',
+    degree: s.degree || '—',
+    graduation_year: s.graduation_year || s.year || '—',
+    student_did: cert.holder_did || '—',
+    issuance_date: s.issued_on || null,
+  };
+  const payload = {
+    vc: {
+      type: ['VerifiableCredential', cert.vc_type || 'UniversityDegreeCredential'],
+      credentialSubject: {
+        ...s,
+        internship: { company: s.company, role: s.role, duration: s.duration },
+        badge: { name: s.skill_name, level: s.proficiency },
+        skill: { name: s.skill_name, level: s.proficiency },
+      },
+    },
+  };
+  renderCertificate(c, payload, verificationId, false);
+}
+
+async function previewVerifierCert(vId) {
+  try {
+    const data = await api('GET', `/verifications/${vId}`);
+    if (data.data) openCertPreviewFromVerification(data.data, vId);
+    else toast('No credential data for this session', 'error');
+  } catch (e) {
+    toast(e.message, 'error');
+  }
 }
 
 async function downloadCertificateImage() {
@@ -2072,15 +2112,20 @@ async function pollVerificationStatus(verificationId) {
       };
       const bannerColor = TYPE_COLORS[vcType] || '#1A237E';
 
+      verifierState.lastVerifiedId = verificationId;
+
       resultCard.innerHTML = `
         <div style="border-radius:12px; overflow:hidden; border:1px solid var(--border); box-shadow:0 4px 20px rgba(0,0,0,0.08);">
           <!-- Banner -->
-          <div style="background:${bannerColor}; padding:1rem 1.25rem; display:flex; align-items:center; gap:0.75rem;">
-            <div style="font-size:1.5rem;">✅</div>
-            <div>
-              <div style="font-weight:700; color:#fff; font-size:1.05rem;">Verification Successful</div>
-              <div style="font-size:0.78rem; color:rgba(255,255,255,0.7);">Proof received and cryptographically verified</div>
+          <div style="background:${bannerColor}; padding:1rem 1.25rem; display:flex; align-items:center; justify-content:space-between; gap:0.75rem;">
+            <div style="display:flex; align-items:center; gap:0.75rem;">
+              <div style="font-size:1.5rem;">✅</div>
+              <div>
+                <div style="font-weight:700; color:#fff; font-size:1.05rem;">Verification Successful</div>
+                <div style="font-size:0.78rem; color:rgba(255,255,255,0.7);">Proof received and cryptographically verified</div>
+              </div>
             </div>
+            <button class="btn btn-sm" onclick="previewVerifierCert('${verificationId}')" style="background:rgba(255,255,255,0.18); color:#fff; border:1px solid rgba(255,255,255,0.35); white-space:nowrap;">🎓 View Certificate</button>
           </div>
           <!-- Fields grid -->
           <div style="display:grid; grid-template-columns:repeat(auto-fill,minmax(160px,1fr)); background:var(--bg-card);">
@@ -2182,6 +2227,7 @@ async function loadVerifierHistory() {
             <th>Summary</th>
             <th>Status</th>
             <th>Date</th>
+            <th></th>
           </tr>
         </thead>
         <tbody>
@@ -2192,6 +2238,7 @@ async function loadVerifierHistory() {
               <td style="font-size:0.85rem;">${s.summary || '—'}</td>
               <td>${statusBadge(s.status)}</td>
               <td style="font-size:0.75rem;">${s.created_at ? new Date(s.created_at).toLocaleDateString() : '—'}</td>
+              <td>${s.status === 'VERIFIED' ? `<button class="btn btn-outline btn-sm" onclick="previewVerifierCert('${s.verification_id}')">🎓 Preview</button>` : ''}</td>
             </tr>
           `).join('')}
         </tbody>
@@ -2242,7 +2289,10 @@ async function viewVerificationDetail(vId, el) {
             <span style="font-weight:700; color:var(--success); font-size:1.1rem;">✅ Verified Proof</span>
             <span class="mono" style="font-size:0.7rem; color:var(--text-muted); margin-left:1rem;">ID: ${vId}</span>
           </div>
-          <button class="btn btn-outline btn-sm" onclick="this.closest('#verification-detail-panel').remove()">✕ Close</button>
+          <div style="display:flex;gap:0.5rem;">
+            <button class="btn btn-primary btn-sm" onclick="previewVerifierCert('${vId}')">🎓 View Certificate</button>
+            <button class="btn btn-outline btn-sm" onclick="this.closest('#verification-detail-panel').remove()">✕ Close</button>
+          </div>
         </div>
         
         <div style="display:grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap:1.25rem;">
